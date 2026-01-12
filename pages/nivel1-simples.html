@@ -8,8 +8,10 @@
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
 
     <link rel="stylesheet" href="../assets/styles/common.css" />
-    <script src="../assets/scripts/common.js"></script>
-    <script src="../assets/scripts/game.js"></script>
+
+    <!-- Core (pode ficar no head com defer) -->
+    <script defer src="../assets/scripts/common.js"></script>
+    <script defer src="../assets/scripts/game.js"></script>
   </head>
 
   <body>
@@ -62,7 +64,6 @@
     <a-scene>
       <a-sky color="#111"></a-sky>
 
-      <!-- Chão com nav-mesh -->
       <a-plane
         position="0 0 0"
         rotation="-90 0 0"
@@ -72,7 +73,6 @@
         nav-mesh
       ></a-plane>
 
-      <!-- Paredes -->
       <a-box
         position="0 2 -7"
         width="15"
@@ -102,7 +102,6 @@
         color="#4a3020"
       ></a-box>
 
-      <!-- Teto -->
       <a-plane
         position="0 4 0"
         rotation="90 0 0"
@@ -111,7 +110,6 @@
         color="#1a1410"
       ></a-plane>
 
-      <!-- CHAVES -->
       <a-sphere
         id="key1"
         class="key"
@@ -142,7 +140,6 @@
         animation__pulse="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 500"
       ></a-sphere>
 
-      <!-- Porta -->
       <a-box
         id="door"
         position="0 2 -6.9"
@@ -151,6 +148,7 @@
         depth="0.1"
         color="#663300"
       ></a-box>
+
       <a-text
         id="door-text"
         value="PORTA TRANCADA"
@@ -160,7 +158,6 @@
         width="5"
       ></a-text>
 
-      <!-- Luz -->
       <a-light type="ambient" intensity="0.3"></a-light>
       <a-light
         type="point"
@@ -169,7 +166,6 @@
         color="#ffaa66"
       ></a-light>
 
-      <!-- Rig -->
       <a-entity
         id="rig"
         position="0 0 5"
@@ -195,86 +191,7 @@
       <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
     </audio>
 
-    <script>
-      let keysFound = 0;
-      const keysSpan = document.getElementById("keys");
-      const msgDiv = document.getElementById("msg");
-
-      startLevelTimer({
-        seconds: 90,
-        onTimeout: () => {
-          msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
-          msgDiv.style.color = "#ff0000";
-          setTimeout(() => location.reload(), 1500);
-        },
-      });
-
-      // Sistema de pegar chaves
-      AFRAME.registerComponent("key-pickup", {
-        init: function () {
-          this.el.addEventListener("click", () => {
-            if (!this.picked) {
-              this.picked = true;
-              keysFound++;
-              keysSpan.textContent = keysFound;
-
-              this.el.setAttribute("visible", "false");
-
-              msgDiv.textContent = `Chave coletada! (${keysFound}/3)`;
-              msgDiv.style.color = "#00ff00";
-
-              if (keysFound === 3) {
-                setTimeout(() => {
-                  msgDiv.textContent = "PORTA ABERTA! Clique nela!";
-                  document.getElementById("door").classList.add("unlocked");
-                }, 500);
-              } else {
-                setTimeout(() => {
-                  msgDiv.textContent = "Encontre as outras chaves!";
-                  msgDiv.style.color = "white";
-                }, 2000);
-              }
-            }
-          });
-        },
-      });
-
-      // Sistema de porta
-      AFRAME.registerComponent("door-system", {
-        init: function () {
-          this.el.addEventListener("click", () => {
-            if (keysFound === 3) {
-              msgDiv.textContent = "NÍVEL CONCLUÍDO! Parabéns!";
-              msgDiv.style.color = "#00ff00";
-              msgDiv.style.fontSize = "24px";
-
-              this.el.setAttribute("animation", {
-                property: "position",
-                to: "0 5 -6.9",
-                dur: 1000,
-              });
-
-              setTimeout(() => {
-                stopLevelTimer();
-                unlockLevel(2);
-                window.location.href = "nivel2-simples.html";
-              }, 2000);
-            } else {
-              msgDiv.textContent = `Você precisa de ${3 - keysFound} chaves!`;
-              msgDiv.style.color = "#ff0000";
-              setTimeout(() => {
-                msgDiv.textContent = "Encontre as chaves!";
-                msgDiv.style.color = "white";
-              }, 2000);
-            }
-          });
-        },
-      });
-
-      document
-        .querySelectorAll(".key")
-        .forEach((key) => key.setAttribute("key-pickup", ""));
-      document.getElementById("door").setAttribute("door-system", "");
-    </script>
+    <!-- Script do nível: no fim do body -->
+    <script src="../assets/scripts/levels/level1.js"></script>
   </body>
 </html>
