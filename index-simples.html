@@ -1,321 +1,139 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Escape Room - Casa Assombrada</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #000000, #1a0000);
-            color: white;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .container {
-            max-width: 600px;
-            padding: 40px;
-        }
-        
-        h1 {
-            font-size: 48px;
-            color: #ff0000;
-            text-shadow: 0 0 20px #ff0000;
-            margin-bottom: 30px;
-            animation: flicker 2s infinite;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        p {
-            font-size: 18px;
-            margin-bottom: 30px;
-            color: #ccc;
-        }
-        
-        .levels {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .level-btn {
-            padding: 20px;
-            font-size: 24px;
-            background: linear-gradient(135deg, #330000, #660000);
-            color: white;
-            border: 2px solid #ff0000;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .level-btn:hover {
-            background: linear-gradient(135deg, #660000, #990000);
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #ff0000;
-        }
-        
-        .info {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255,0,0,0.1);
-            border-radius: 10px;
-            border: 1px solid #ff0000;
-        }
-        
-        .info h3 {
-            color: #ff6666;
-            margin-bottom: 10px;
-        }
-        
-        .info ul {
-            list-style: none;
-            text-align: left;
-        }
-        
-        .info li {
-            margin: 5px 0;
-            padding-left: 20px;
-        }
-        
-        .settings {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 10px;
-            border: 2px solid #ff6600;
-        }
-        
-        .settings h3 {
-            color: #ff6600;
-            margin-bottom: 15px;
-        }
-        
-        .setting-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 5px;
-        }
-        
-        .toggle {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: #666;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .toggle.active {
-            background: #00ff00;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.3s;
-        }
-        
-        .toggle.active .toggle-slider {
-            left: 32px;
-        }
-        
-        input[type="range"] {
-            width: 150px;
-            cursor: pointer;
-        }
-        
-        .settings-icon {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(102, 0, 0, 0.8);
-            border: 2px solid #ff0000;
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        
-        .settings-icon:hover {
-            background: rgba(153, 0, 0, 0.9);
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #ff0000;
-        }
-        
-        .settings-icon .icon {
-            font-size: 24px;
-            transition: transform 0.3s;
-        }
-        
-        .settings-icon:hover .icon {
-            transform: rotate(90deg);
-        }
-        
-        .settings-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        
-        .settings-overlay.active {
-            display: flex;
-        }
-        
-        .settings-modal {
-            background: linear-gradient(135deg, #1a0000, #330000);
-            border: 3px solid #ff0000;
-            border-radius: 15px;
-            padding: 40px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 0 50px #ff0000;
-        }
-        
-        .close-settings {
-            float: right;
-            font-size: 32px;
-            cursor: pointer;
-            color: #ff0000;
-            line-height: 1;
-            margin-top: -10px;
-        }
-        
-        .close-settings:hover {
-            color: #ff6666;
-        }
-    </style>
-</head>
-<body>
+
+    <!-- CSS do index -->
+    <link rel="stylesheet" href="assets/styles/index.css" />
+
+    <!-- Common JS (settings em localStorage) -->
+    <script src="assets/scripts/common.js"></script>
+  </head>
+
+  <body>
     <div class="settings-icon" onclick="toggleSettings()">
-        <span class="icon">⚙️</span>
-        <span>CONFIGURAÇÕES</span>
+      <span class="icon">⚙️</span>
+      <span>CONFIGURAÇÕES</span>
     </div>
-    
-    <div class="settings-overlay" id="settings-overlay" onclick="closeSettingsIfOverlay(event)">
-        <div class="settings-modal">
-            <span class="close-settings" onclick="toggleSettings()">×</span>
-            <h3 style="color: #ff6600; margin-bottom: 20px;">CONFIGURAÇÕES</h3>
-            <div class="setting-item">
-                <span>Música Ambiente:</span>
-                <div class="toggle active" id="music-toggle" onclick="toggleMusicSetting()">
-                    <div class="toggle-slider"></div>
-                </div>
-            </div>
-            <div class="setting-item">
-                <span>Volume:</span>
-                <input type="range" id="volume-slider" min="0" max="100" value="40" oninput="updateVolume(this.value)">
-                <span id="volume-value">40%</span>
-            </div>
+
+    <div
+      class="settings-overlay"
+      id="settings-overlay"
+      onclick="closeSettingsIfOverlay(event)"
+    >
+      <div class="settings-modal">
+        <span class="close-settings" onclick="toggleSettings()">×</span>
+        <h3 style="color: #ff6600; margin-bottom: 20px">CONFIGURAÇÕES</h3>
+
+        <div class="setting-item">
+          <span>Música Ambiente:</span>
+          <div
+            class="toggle active"
+            id="music-toggle"
+            onclick="toggleMusicSetting()"
+          >
+            <div class="toggle-slider"></div>
+          </div>
         </div>
+
+        <div class="setting-item">
+          <span>Volume:</span>
+          <input
+            type="range"
+            id="volume-slider"
+            min="0"
+            max="100"
+            value="40"
+            oninput="updateVolume(this.value)"
+          />
+          <span id="volume-value">40%</span>
+        </div>
+      </div>
     </div>
+
     <div class="container">
-        <h1>ESCAPE ROOM</h1>
-        <p>Bem-vindo à Casa Assombrada. Complete os 3 níveis para escapar!</p>
-        
-        <div class="info">
-            <h3>COMO JOGAR</h3>
-            <ul>
-                <li><strong>WASD</strong> - Mover</li>
-                <li><strong>Mouse</strong> - Olhar ao redor</li>
-                <li><strong>Cursor vermelho</strong> - Olhe para objetos brilhantes</li>
-                <li><strong>Clique automático</strong> - Mantenha cursor sobre objeto</li>
-                <li><strong>ESC</strong> - Menu de pausa (durante o jogo)</li>
-            </ul>
-        </div>
-        
-        <div class="levels">
-            <a href="nivel1-simples.html" class="level-btn">
-                NÍVEL 1 - Entrada<br>
-                <small style="font-size: 16px;">Encontre 3 chaves</small>
-            </a>
-            
-            <a href="nivel2-simples.html" class="level-btn">
-                NÍVEL 2 - Corredor<br>
-                <small style="font-size: 16px;">Acenda 4 velas na ordem</small>
-            </a>
-            
-            <a href="nivel3-simples.html" class="level-btn">
-                NÍVEL 3 - Sala Final<br>
-                <small style="font-size: 16px;">Descubra o código secreto</small>
-            </a>
-        </div>
+      <h1>ESCAPE ROOM</h1>
+      <p>Bem-vindo à Casa Assombrada. Complete os 3 níveis para escapar!</p>
+
+      <div class="info">
+        <h3>COMO JOGAR</h3>
+        <ul>
+          <li><strong>WASD</strong> - Mover</li>
+          <li><strong>Mouse</strong> - Olhar ao redor</li>
+          <li>
+            <strong>Cursor vermelho</strong> - Olhe para objetos brilhantes
+          </li>
+          <li>
+            <strong>Clique automático</strong> - Mantenha cursor sobre objeto
+          </li>
+          <li><strong>ESC</strong> - Menu de pausa (durante o jogo)</li>
+        </ul>
+      </div>
+
+      <div class="levels">
+        <a href="nivel1-simples.html" class="level-btn">
+          NÍVEL 1 - Entrada<br />
+          <small style="font-size: 16px">Encontre 3 chaves</small>
+        </a>
+
+        <a href="nivel2-simples.html" class="level-btn">
+          NÍVEL 2 - Corredor<br />
+          <small style="font-size: 16px">Acenda 4 velas na ordem</small>
+        </a>
+
+        <a href="nivel3-simples.html" class="level-btn">
+          NÍVEL 3 - Sala Final<br />
+          <small style="font-size: 16px">Descubra o código secreto</small>
+        </a>
+      </div>
     </div>
-    
+
     <script>
-        // Carrega configurações salvas
-        let musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
-        let musicVolume = parseInt(localStorage.getItem('musicVolume') || '40');
-        
-        // Aplica configurações iniciais
-        document.getElementById('music-toggle').classList.toggle('active', musicEnabled);
-        document.getElementById('volume-slider').value = musicVolume;
-        document.getElementById('volume-value').textContent = musicVolume + '%';
-        
-        function toggleMusicSetting() {
-            musicEnabled = !musicEnabled;
-            localStorage.setItem('musicEnabled', musicEnabled);
-            document.getElementById('music-toggle').classList.toggle('active', musicEnabled);
-        }
-        
-        function updateVolume(value) {
-            musicVolume = parseInt(value);
-            localStorage.setItem('musicVolume', musicVolume);
-            document.getElementById('volume-value').textContent = value + '%';
-        }
-        
-        function toggleSettings() {
-            const overlay = document.getElementById('settings-overlay');
-            overlay.classList.toggle('active');
-        }
-        
-        function closeSettingsIfOverlay(event) {
-            if (event.target.id === 'settings-overlay') {
-                toggleSettings();
-            }
-        }
+      // ===== Aplicar settings guardadas (via common.js) =====
+      function syncIndexSettingsUI() {
+        const enabled = getMusicEnabled();
+        const vol = getMusicVolume();
+
+        document
+          .getElementById("music-toggle")
+          .classList.toggle("active", enabled);
+        document.getElementById("volume-slider").value = String(vol);
+        document.getElementById("volume-value").textContent = `${vol}%`;
+      }
+
+      // ===== Funções do overlay (UI) =====
+      function toggleSettings() {
+        document.getElementById("settings-overlay").classList.toggle("active");
+      }
+
+      function closeSettingsIfOverlay(event) {
+        if (event.target.id === "settings-overlay") toggleSettings();
+      }
+
+      // ===== Funções do index que gravam settings (via common.js) =====
+      function toggleMusicSetting() {
+        setMusicEnabled(!getMusicEnabled());
+        syncIndexSettingsUI();
+      }
+
+      function updateVolume(value) {
+        const v = parseInt(value, 10);
+        if (Number.isNaN(v)) return;
+
+        setMusicVolume(v);
+        document.getElementById("volume-value").textContent = `${v}%`;
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        syncIndexSettingsUI();
+      });
     </script>
-</body>
+  </body>
 </html>

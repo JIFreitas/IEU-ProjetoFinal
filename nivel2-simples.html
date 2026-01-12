@@ -3,156 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <title>Nível 2 - Acenda 4 Velas</title>
+
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
 
-    <script>
-      AFRAME.registerComponent("clamp-bounds", {
-        schema: {
-          minX: { type: "number" },
-          maxX: { type: "number" },
-          minZ: { type: "number" },
-          maxZ: { type: "number" },
-          margin: { type: "number", default: 0.15 },
-        },
-
-        // Usa TOCK: corre depois dos movement-controls
-        tock: function () {
-          const d = this.data;
-
-          // posição atual do rig (depois do movement-controls mexer)
-          const p = this.el.getAttribute("position");
-          if (!p) return;
-
-          const x = Math.min(
-            d.maxX - d.margin,
-            Math.max(d.minX + d.margin, p.x)
-          );
-          const z = Math.min(
-            d.maxZ - d.margin,
-            Math.max(d.minZ + d.margin, p.z)
-          );
-
-          if (x !== p.x || z !== p.z) {
-            // Atualiza pelo componente position (não só object3D)
-            this.el.setAttribute("position", { x, y: p.y, z });
-          }
-        },
-      });
-    </script>
-
-    <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-      }
-      #hud {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        color: white;
-        font-family: Arial;
-        font-size: 20px;
-        background: rgba(0, 0, 0, 0.8);
-        padding: 15px;
-        border-radius: 10px;
-        z-index: 1000;
-      }
-      #pause-menu {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.95);
-        padding: 40px;
-        border-radius: 20px;
-        border: 3px solid #ff6600;
-        box-shadow: 0 0 50px rgba(255, 102, 0, 0.8);
-        z-index: 2000;
-        display: none;
-        text-align: center;
-        min-width: 400px;
-      }
-      #pause-menu h2 {
-        color: #ff6600;
-        margin-bottom: 30px;
-      }
-      .menu-btn {
-        display: block;
-        width: 100%;
-        padding: 15px;
-        margin: 10px 0;
-        font-size: 18px;
-        background: #330000;
-        color: white;
-        border: 2px solid #ff6600;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-      .menu-btn:hover {
-        background: #663300;
-        transform: scale(1.05);
-      }
-      .setting-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 15px;
-        margin: 10px 0;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        color: #ffffff;
-        font-size: 20px;
-        font-weight: bold;
-      }
-      .setting-row span {
-        color: #ffffff;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-      }
-      #vol-display {
-        color: #00ff00;
-        font-weight: bold;
-        min-width: 50px;
-      }
-      .toggle {
-        position: relative;
-        width: 60px;
-        height: 30px;
-        background: #666;
-        border-radius: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-      .toggle.active {
-        background: #00ff00;
-      }
-      .toggle-slider {
-        position: absolute;
-        width: 26px;
-        height: 26px;
-        background: white;
-        border-radius: 50%;
-        top: 2px;
-        left: 2px;
-        transition: all 0.3s;
-      }
-      .toggle.active .toggle-slider {
-        left: 32px;
-      }
-    </style>
+    <link rel="stylesheet" href="assets/styles/common.css" />
+    <script src="assets/scripts/common.js"></script>
   </head>
+
   <body>
     <div id="hud">
       <div>Velas: <span id="candles">0</span>/4</div>
       <div id="msg">Acenda as velas na ordem: 1 → 2 → 3 → 4</div>
-      <div style="margin-top: 10px; font-size: 14px; color: #888">
-        Pressione ESC para pausar
-      </div>
+      <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
-    <div id="pause-menu">
+    <div id="pause-menu" class="theme-orange">
       <h2>JOGO PAUSADO</h2>
+
       <div class="setting-row">
         <span>Música:</span>
         <div
@@ -163,6 +31,7 @@
           <div class="toggle-slider"></div>
         </div>
       </div>
+
       <div class="setting-row">
         <span>Volume:</span>
         <input
@@ -175,9 +44,12 @@
         />
         <span id="vol-display">40%</span>
       </div>
-      <button class="menu-btn" onclick="resumeGame()">Continuar</button>
+
+      <button class="menu-btn btn-orange" onclick="resumeGame()">
+        Continuar
+      </button>
       <button
-        class="menu-btn"
+        class="menu-btn btn-orange"
         onclick="window.location.href='index-simples.html'"
       >
         Menu Principal
@@ -236,7 +108,7 @@
         color="#0a0a0a"
       ></a-plane>
 
-      <!-- VELAS com números -->
+      <!-- Velas -->
       <a-entity position="-1 1.5 -8">
         <a-cylinder
           id="candle1"
@@ -345,7 +217,7 @@
         ></a-sphere>
       </a-entity>
 
-      <!-- Porta final -->
+      <!-- Porta -->
       <a-box
         id="door"
         position="0 2 -15"
@@ -364,7 +236,7 @@
         color="#ffaa66"
       ></a-light>
 
-      <!-- Camera -->
+      <!-- Rig -->
       <a-entity
         id="rig"
         position="0 0 2"
@@ -392,125 +264,50 @@
 
     <script>
       let candlesLit = 0;
-      let correctOrder = true;
       const candlesSpan = document.getElementById("candles");
       const msgDiv = document.getElementById("msg");
-      const bgMusic = document.getElementById("bg-music");
-      let musicPlaying = false;
-      let isPaused = false;
-
-      // Carrega configurações
-      let musicEnabled = localStorage.getItem("musicEnabled") !== "false";
-      let musicVolume = parseInt(localStorage.getItem("musicVolume") || "40");
-      bgMusic.volume = musicVolume / 100;
-
-      // Inicia música se habilitada
-      if (musicEnabled) {
-        bgMusic
-          .play()
-          .catch((err) => console.log("Música aguardando interação"));
-        musicPlaying = true;
-      }
-
-      // Atualiza UI do menu de pausa
-      document
-        .getElementById("music-toggle")
-        .classList.toggle("active", musicEnabled);
-      document.getElementById("volume-control").value = musicVolume;
-      document.getElementById("vol-display").textContent = musicVolume + "%";
-
-      // Menu de pausa (ESC)
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          isPaused = !isPaused;
-          document.getElementById("pause-menu").style.display = isPaused
-            ? "block"
-            : "none";
-          if (isPaused && musicPlaying) {
-            bgMusic.pause();
-          } else if (!isPaused && musicEnabled) {
-            bgMusic.play();
-          }
-        }
-      });
-
-      function resumeGame() {
-        isPaused = false;
-        document.getElementById("pause-menu").style.display = "none";
-        if (musicEnabled) bgMusic.play();
-      }
-
-      function togglePauseMusic() {
-        musicEnabled = !musicEnabled;
-        localStorage.setItem("musicEnabled", musicEnabled);
-        document
-          .getElementById("music-toggle")
-          .classList.toggle("active", musicEnabled);
-        if (musicEnabled) {
-          bgMusic.play();
-          musicPlaying = true;
-        } else {
-          bgMusic.pause();
-          musicPlaying = false;
-        }
-      }
-
-      function updatePauseVolume(value) {
-        musicVolume = parseInt(value);
-        localStorage.setItem("musicVolume", musicVolume);
-        bgMusic.volume = musicVolume / 100;
-        document.getElementById("vol-display").textContent = value + "%";
-      }
 
       AFRAME.registerComponent("candle-light", {
         init: function () {
           this.el.addEventListener("click", () => {
-            if (!this.lit) {
-              const order = parseInt(this.el.getAttribute("data-order"));
+            if (this.lit) return;
 
-              // Verifica ordem
-              if (order === candlesLit + 1) {
-                this.lit = true;
-                candlesLit++;
-                candlesSpan.textContent = candlesLit;
+            const order = parseInt(this.el.getAttribute("data-order"));
 
-                // Acende chama
-                const flameId = "flame" + order;
-                document
-                  .getElementById(flameId)
-                  .setAttribute("visible", "true");
+            if (order === candlesLit + 1) {
+              this.lit = true;
+              candlesLit++;
+              candlesSpan.textContent = candlesLit;
 
-                // Adiciona luz
-                const light = document.createElement("a-light");
-                light.setAttribute("type", "point");
-                light.setAttribute("intensity", "0.8");
-                light.setAttribute("color", "#ff6600");
-                light.setAttribute("distance", "3");
-                this.el.parentElement.appendChild(light);
+              const flameId = "flame" + order;
+              document.getElementById(flameId).setAttribute("visible", "true");
 
-                msgDiv.textContent = `Vela ${order} acesa! ✓`;
-                msgDiv.style.color = "#00ff00";
+              const light = document.createElement("a-light");
+              light.setAttribute("type", "point");
+              light.setAttribute("intensity", "0.8");
+              light.setAttribute("color", "#ff6600");
+              light.setAttribute("distance", "3");
+              this.el.parentElement.appendChild(light);
 
-                if (candlesLit === 4) {
-                  setTimeout(() => {
-                    msgDiv.textContent = "TODAS ACESAS! Clique na porta!";
-                    document.getElementById("door").classList.add("unlocked");
-                  }, 1000);
-                } else {
-                  setTimeout(() => {
-                    msgDiv.textContent = `Acenda a vela ${candlesLit + 1}`;
-                    msgDiv.style.color = "white";
-                  }, 1500);
-                }
-              } else {
-                msgDiv.textContent = `ERRADO! Acenda na ordem: 1→2→3→4`;
-                msgDiv.style.color = "#ff0000";
+              msgDiv.textContent = `Vela ${order} acesa! ✓`;
+              msgDiv.style.color = "#00ff00";
 
-                // Reset
+              if (candlesLit === 4) {
                 setTimeout(() => {
-                  location.reload();
-                }, 2000);
+                  msgDiv.textContent = "TODAS ACESAS! Clique na porta!";
+                  document.getElementById("door").classList.add("unlocked");
+                }, 1000);
+              } else {
+                setTimeout(() => {
+                  msgDiv.textContent = `Acenda a vela ${candlesLit + 1}`;
+                  msgDiv.style.color = "white";
+                }, 1500);
               }
+            } else {
+              msgDiv.textContent = "ERRADO! Acenda na ordem: 1→2→3→4";
+              msgDiv.style.color = "#ff0000";
+
+              setTimeout(() => location.reload(), 2000);
             }
           });
         },
@@ -533,16 +330,16 @@
                 window.location.href = "nivel3-simples.html";
               }, 2000);
             } else {
-              msgDiv.textContent = `Acenda todas as 4 velas primeiro!`;
+              msgDiv.textContent = "Acenda todas as 4 velas primeiro!";
               msgDiv.style.color = "#ff0000";
             }
           });
         },
       });
 
-      document.querySelectorAll(".candle").forEach((candle) => {
-        candle.setAttribute("candle-light", "");
-      });
+      document
+        .querySelectorAll(".candle")
+        .forEach((candle) => candle.setAttribute("candle-light", ""));
       document.getElementById("door").setAttribute("door-system", "");
     </script>
   </body>

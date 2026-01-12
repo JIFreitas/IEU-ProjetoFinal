@@ -3,61 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <title>Nível 3 - Descubra o Código</title>
+
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
 
-    <script>
-      AFRAME.registerComponent("clamp-bounds", {
-        schema: {
-          minX: { type: "number" },
-          maxX: { type: "number" },
-          minZ: { type: "number" },
-          maxZ: { type: "number" },
-          margin: { type: "number", default: 0.15 },
-        },
+    <link rel="stylesheet" href="assets/styles/common.css" />
+    <script src="assets/scripts/common.js"></script>
 
-        // Usa TOCK: corre depois dos movement-controls
-        tock: function () {
-          const d = this.data;
-
-          // posição atual do rig (depois do movement-controls mexer)
-          const p = this.el.getAttribute("position");
-          if (!p) return;
-
-          const x = Math.min(
-            d.maxX - d.margin,
-            Math.max(d.minX + d.margin, p.x)
-          );
-          const z = Math.min(
-            d.maxZ - d.margin,
-            Math.max(d.minZ + d.margin, p.z)
-          );
-
-          if (x !== p.x || z !== p.z) {
-            // Atualiza pelo componente position (não só object3D)
-            this.el.setAttribute("position", { x, y: p.y, z });
-          }
-        },
-      });
-    </script>
-
+    <!-- CSS específico do nível 3 (música + input do código) -->
     <style>
-      body {
-        margin: 0;
-        overflow: hidden;
-      }
-      #hud {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        color: white;
-        font-family: Arial;
-        font-size: 20px;
-        background: rgba(0, 0, 0, 0.8);
-        padding: 15px;
-        border-radius: 10px;
-        z-index: 1000;
-      }
       #music-control {
         position: fixed;
         top: 20px;
@@ -86,88 +40,6 @@
         50% {
           box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
         }
-      }
-      #pause-menu {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.95);
-        padding: 40px;
-        border-radius: 20px;
-        border: 3px solid #00ff00;
-        box-shadow: 0 0 50px rgba(0, 255, 0, 0.8);
-        z-index: 3000;
-        display: none;
-        text-align: center;
-        min-width: 400px;
-      }
-      #pause-menu h2 {
-        color: #00ff00;
-        margin-bottom: 30px;
-      }
-      .menu-btn {
-        display: block;
-        width: 100%;
-        padding: 15px;
-        margin: 10px 0;
-        font-size: 18px;
-        background: #003300;
-        color: white;
-        border: 2px solid #00ff00;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-      .menu-btn:hover {
-        background: #006600;
-        transform: scale(1.05);
-      }
-      .setting-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 15px;
-        margin: 10px 0;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        color: #ffffff;
-        font-size: 20px;
-        font-weight: bold;
-      }
-      .setting-row span {
-        color: #ffffff;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-      }
-      #vol-display {
-        color: #00ff00;
-        font-weight: bold;
-        min-width: 50px;
-      }
-      .toggle {
-        position: relative;
-        width: 60px;
-        height: 30px;
-        background: #666;
-        border-radius: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-      .toggle.active {
-        background: #00ff00;
-      }
-      .toggle-slider {
-        position: absolute;
-        width: 26px;
-        height: 26px;
-        background: white;
-        border-radius: 50%;
-        top: 2px;
-        left: 2px;
-        transition: all 0.3s;
-      }
-      .toggle.active .toggle-slider {
-        left: 32px;
       }
       #code-input {
         position: fixed;
@@ -202,17 +74,17 @@
       }
     </style>
   </head>
+
   <body>
     <div id="hud">
       <div>Pistas: <span id="clues">0</span>/4</div>
       <div id="msg">Encontre 4 pistas para descobrir o código!</div>
-      <div style="margin-top: 10px; font-size: 14px; color: #888">
-        Pressione ESC para pausar
-      </div>
+      <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
-    <div id="pause-menu">
+    <div id="pause-menu" class="theme-green">
       <h2>JOGO PAUSADO</h2>
+
       <div class="setting-row">
         <span>Música:</span>
         <div
@@ -223,6 +95,7 @@
           <div class="toggle-slider"></div>
         </div>
       </div>
+
       <div class="setting-row">
         <span>Volume:</span>
         <input
@@ -235,9 +108,12 @@
         />
         <span id="vol-display">40%</span>
       </div>
-      <button class="menu-btn" onclick="resumeGame()">Continuar</button>
+
+      <button class="menu-btn btn-green" onclick="resumeGame()">
+        Continuar
+      </button>
       <button
-        class="menu-btn"
+        class="menu-btn btn-green"
         onclick="window.location.href='index-simples.html'"
       >
         Menu Principal
@@ -257,7 +133,7 @@
     <a-scene>
       <a-sky color="#000"></a-sky>
 
-      <!-- Chão com nav-mesh (ligeiramente menor que as paredes) -->
+      <!-- Chão -->
       <a-plane
         position="0 0 0"
         rotation="-90 0 0"
@@ -297,7 +173,7 @@
         color="#1a1a1a"
       ></a-box>
 
-      <!-- PISTAS (cubos coloridos grandes) -->
+      <!-- Pistas -->
       <a-entity position="-3 1.5 -4">
         <a-box
           id="clue1"
@@ -378,7 +254,7 @@
         ></a-text>
       </a-entity>
 
-      <!-- Terminal no centro -->
+      <!-- Terminal -->
       <a-box
         id="terminal"
         class="terminal"
@@ -406,7 +282,7 @@
         color="#ffffff"
       ></a-light>
 
-      <!-- Camera -->
+      <!-- Rig -->
       <a-entity
         id="rig"
         position="0 0 5"
@@ -436,130 +312,48 @@
       let cluesFound = 0;
       let code = "";
       const correctCode = "3719";
+
       const cluesSpan = document.getElementById("clues");
       const msgDiv = document.getElementById("msg");
-      const bgMusic = document.getElementById("bg-music");
-      let musicPlaying = false;
-      let isPaused = false;
-
-      // Carrega configurações
-      let musicEnabled = localStorage.getItem("musicEnabled") !== "false";
-      let musicVolume = parseInt(localStorage.getItem("musicVolume") || "40");
-      bgMusic.volume = musicVolume / 100;
-
-      // Inicia música se habilitada
-      if (musicEnabled) {
-        bgMusic
-          .play()
-          .catch((err) => console.log("Música aguardando interação"));
-        musicPlaying = true;
-        document.getElementById("music-control").style.display = "none";
-      }
-
-      // Atualiza UI do menu de pausa
-      document
-        .getElementById("music-toggle")
-        .classList.toggle("active", musicEnabled);
-      document.getElementById("volume-control").value = musicVolume;
-      document.getElementById("vol-display").textContent = musicVolume + "%";
-
-      // Menu de pausa (ESC)
-      document.addEventListener("keydown", (e) => {
-        if (
-          e.key === "Escape" &&
-          document.getElementById("code-input").style.display !== "block"
-        ) {
-          isPaused = !isPaused;
-          document.getElementById("pause-menu").style.display = isPaused
-            ? "block"
-            : "none";
-          if (isPaused && musicPlaying) {
-            bgMusic.pause();
-          } else if (!isPaused && musicEnabled) {
-            bgMusic.play();
-          }
-        }
-      });
-
-      function resumeGame() {
-        isPaused = false;
-        document.getElementById("pause-menu").style.display = "none";
-        if (musicEnabled) bgMusic.play();
-      }
-
-      function toggleMusic() {
-        musicEnabled = !musicEnabled;
-        localStorage.setItem("musicEnabled", musicEnabled);
-        if (musicEnabled) {
-          bgMusic.play();
-          musicPlaying = true;
-          document.getElementById("music-control").style.display = "none";
-        } else {
-          bgMusic.pause();
-          musicPlaying = false;
-        }
-      }
-
-      function togglePauseMusic() {
-        musicEnabled = !musicEnabled;
-        localStorage.setItem("musicEnabled", musicEnabled);
-        document
-          .getElementById("music-toggle")
-          .classList.toggle("active", musicEnabled);
-        if (musicEnabled) {
-          bgMusic.play();
-          musicPlaying = true;
-        } else {
-          bgMusic.pause();
-          musicPlaying = false;
-        }
-      }
-
-      function updatePauseVolume(value) {
-        musicVolume = parseInt(value);
-        localStorage.setItem("musicVolume", musicVolume);
-        bgMusic.volume = musicVolume / 100;
-        document.getElementById("vol-display").textContent = value + "%";
-      }
 
       AFRAME.registerComponent("clue-finder", {
         init: function () {
           this.el.addEventListener("click", () => {
-            if (!this.found) {
-              this.found = true;
-              cluesFound++;
-              cluesSpan.textContent = cluesFound;
+            if (this.found) return;
 
-              const digit = this.el.getAttribute("data-digit");
-              code += digit;
+            this.found = true;
+            cluesFound++;
+            cluesSpan.textContent = cluesFound;
 
-              // Mostra dígito
-              const parent = this.el.parentElement;
-              const text = parent.querySelector("a-text");
-              text.setAttribute("value", digit);
-              text.setAttribute("color", "#00ff00");
+            const digit = this.el.getAttribute("data-digit");
+            code += digit;
 
-              msgDiv.textContent = `Pista encontrada: ${digit}`;
-              msgDiv.style.color = "#00ff00";
+            const parent = this.el.parentElement;
+            const text = parent.querySelector("a-text");
+            text.setAttribute("value", digit);
+            text.setAttribute("color", "#00ff00");
 
-              if (cluesFound === 4) {
-                setTimeout(() => {
-                  msgDiv.textContent = "TODAS AS PISTAS! Clique no terminal!";
-                  msgDiv.style.fontSize = "24px";
-                  document.getElementById("terminal").classList.add("unlocked");
-                  document
-                    .querySelector("#terminal a-text")
-                    .setAttribute("value", "TERMINAL\n[CLIQUE AQUI]");
-                  document
-                    .querySelector("#terminal a-text")
-                    .setAttribute("color", "#ffff00");
-                }, 1000);
-              } else {
-                setTimeout(() => {
-                  msgDiv.textContent = `${4 - cluesFound} pistas restantes`;
-                  msgDiv.style.color = "white";
-                }, 2000);
-              }
+            msgDiv.textContent = `Pista encontrada: ${digit}`;
+            msgDiv.style.color = "#00ff00";
+
+            if (cluesFound === 4) {
+              setTimeout(() => {
+                msgDiv.textContent = "TODAS AS PISTAS! Clique no terminal!";
+                msgDiv.style.fontSize = "24px";
+
+                document.getElementById("terminal").classList.add("unlocked");
+                document
+                  .querySelector("#terminal a-text")
+                  .setAttribute("value", "TERMINAL\n[CLIQUE AQUI]");
+                document
+                  .querySelector("#terminal a-text")
+                  .setAttribute("color", "#ffff00");
+              }, 1000);
+            } else {
+              setTimeout(() => {
+                msgDiv.textContent = `${4 - cluesFound} pistas restantes`;
+                msgDiv.style.color = "white";
+              }, 2000);
             }
           });
         },
@@ -568,7 +362,6 @@
       AFRAME.registerComponent("terminal-system", {
         init: function () {
           this.el.addEventListener("click", () => {
-            console.log("Terminal clicado! Pistas:", cluesFound);
             if (cluesFound === 4) {
               document.getElementById("code-input").style.display = "block";
               document.getElementById("code").focus();
@@ -592,6 +385,7 @@
         if (input === correctCode) {
           codeMsg.innerHTML =
             '<h2 style="color: #00ff00;">✓ CÓDIGO CORRETO!</h2><p>PARABÉNS! VOCÊ ESCAPOU!</p>';
+
           setTimeout(() => {
             alert("🎉 VOCÊ COMPLETOU TODOS OS NÍVEIS! 🎉");
             window.location.href = "index-simples.html";
@@ -603,14 +397,13 @@
         }
       }
 
-      // Enter para confirmar
       document.getElementById("code").addEventListener("keypress", (e) => {
         if (e.key === "Enter") checkCode();
       });
 
-      document.querySelectorAll(".clue").forEach((clue) => {
-        clue.setAttribute("clue-finder", "");
-      });
+      document
+        .querySelectorAll(".clue")
+        .forEach((clue) => clue.setAttribute("clue-finder", ""));
       document.getElementById("terminal").setAttribute("terminal-system", "");
     </script>
   </body>
