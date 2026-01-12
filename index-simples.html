@@ -152,12 +152,119 @@
             width: 150px;
             cursor: pointer;
         }
+        
+        .settings-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(102, 0, 0, 0.8);
+            border: 2px solid #ff0000;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .settings-icon:hover {
+            background: rgba(153, 0, 0, 0.9);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #ff0000;
+        }
+        
+        .settings-icon .icon {
+            font-size: 24px;
+            transition: transform 0.3s;
+        }
+        
+        .settings-icon:hover .icon {
+            transform: rotate(90deg);
+        }
+        
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .settings-overlay.active {
+            display: flex;
+        }
+        
+        .settings-modal {
+            background: linear-gradient(135deg, #1a0000, #330000);
+            border: 3px solid #ff0000;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 50px #ff0000;
+        }
+        
+        .close-settings {
+            float: right;
+            font-size: 32px;
+            cursor: pointer;
+            color: #ff0000;
+            line-height: 1;
+            margin-top: -10px;
+        }
+        
+        .close-settings:hover {
+            color: #ff6666;
+        }
     </style>
 </head>
 <body>
+    <div class="settings-icon" onclick="toggleSettings()">
+        <span class="icon">⚙️</span>
+        <span>CONFIGURAÇÕES</span>
+    </div>
+    
+    <div class="settings-overlay" id="settings-overlay" onclick="closeSettingsIfOverlay(event)">
+        <div class="settings-modal">
+            <span class="close-settings" onclick="toggleSettings()">×</span>
+            <h3 style="color: #ff6600; margin-bottom: 20px;">CONFIGURAÇÕES</h3>
+            <div class="setting-item">
+                <span>Música Ambiente:</span>
+                <div class="toggle active" id="music-toggle" onclick="toggleMusicSetting()">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="setting-item">
+                <span>Volume:</span>
+                <input type="range" id="volume-slider" min="0" max="100" value="40" oninput="updateVolume(this.value)">
+                <span id="volume-value">40%</span>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <h1>ESCAPE ROOM</h1>
         <p>Bem-vindo à Casa Assombrada. Complete os 3 níveis para escapar!</p>
+        
+        <div class="info">
+            <h3>COMO JOGAR</h3>
+            <ul>
+                <li><strong>WASD</strong> - Mover</li>
+                <li><strong>Mouse</strong> - Olhar ao redor</li>
+                <li><strong>Cursor vermelho</strong> - Olhe para objetos brilhantes</li>
+                <li><strong>Clique automático</strong> - Mantenha cursor sobre objeto</li>
+                <li><strong>ESC</strong> - Menu de pausa (durante o jogo)</li>
+            </ul>
+        </div>
         
         <div class="levels">
             <a href="nivel1-simples.html" class="level-btn">
@@ -174,32 +281,6 @@
                 NÍVEL 3 - Sala Final<br>
                 <small style="font-size: 16px;">Descubra o código secreto</small>
             </a>
-        </div>
-        
-        <div class="info">
-            <h3>COMO JOGAR</h3>
-            <ul>
-                <li><strong>WASD</strong> - Mover</li>
-                <li><strong>Mouse</strong> - Olhar ao redor</li>
-                <li><strong>Cursor vermelho</strong> - Olhe para objetos brilhantes</li>
-                <li><strong>Clique automático</strong> - Mantenha cursor sobre objeto</li>
-                <li><strong>ESC</strong> - Menu de pausa (durante o jogo)</li>
-            </ul>
-        </div>
-        
-        <div class="settings">
-            <h3>CONFIGURAÇÕES</h3>
-            <div class="setting-item">
-                <span>Música Ambiente:</span>
-                <div class="toggle active" id="music-toggle" onclick="toggleMusicSetting()">
-                    <div class="toggle-slider"></div>
-                </div>
-            </div>
-            <div class="setting-item">
-                <span>Volume:</span>
-                <input type="range" id="volume-slider" min="0" max="100" value="40" oninput="updateVolume(this.value)">
-                <span id="volume-value">40%</span>
-            </div>
         </div>
     </div>
     
@@ -223,6 +304,17 @@
             musicVolume = parseInt(value);
             localStorage.setItem('musicVolume', musicVolume);
             document.getElementById('volume-value').textContent = value + '%';
+        }
+        
+        function toggleSettings() {
+            const overlay = document.getElementById('settings-overlay');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeSettingsIfOverlay(event) {
+            if (event.target.id === 'settings-overlay') {
+                toggleSettings();
+            }
         }
     </script>
 </body>

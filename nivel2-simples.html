@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Nível 2 - Acenda 4 Velas</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
         #hud {
@@ -62,6 +63,18 @@
             margin: 10px 0;
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .setting-row span {
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        #vol-display {
+            color: #00ff00;
+            font-weight: bold;
+            min-width: 50px;
         }
         .toggle {
             position: relative;
@@ -117,12 +130,14 @@
     <a-scene>
         <a-sky color="#050505"></a-sky>
         
-        <!-- Chão -->
-        <a-plane position="0 0 -5" rotation="-90 0 0" width="6" height="20" color="#1a1410"></a-plane>
+        <!-- Chão com nav-mesh -->
+        <a-plane position="0 0 -5" rotation="-90 0 0" width="4" height="19.6" color="#1a1410" nav-mesh></a-plane>
         
         <!-- Paredes corredor -->
         <a-box position="-2.5 2 -5" width="0.2" height="4" depth="20" color="#3a2510"></a-box>
         <a-box position="2.5 2 -5" width="0.2" height="4" depth="20" color="#3a2510"></a-box>
+        <a-box position="0 2 5" width="6" height="4" depth="0.2" color="#3a2510"></a-box>
+        <a-box position="0 2 -15" width="6" height="4" depth="0.2" color="#3a2510"></a-box>
         
         <!-- Teto -->
         <a-plane position="0 4 -5" rotation="90 0 0" width="6" height="20" color="#0a0a0a"></a-plane>
@@ -164,8 +179,8 @@
         <a-light type="point" position="0 3 -8" intensity="0.5" color="#ffaa66"></a-light>
         
         <!-- Camera -->
-        <a-entity position="0 1.6 2">
-            <a-camera wasd-controls look-controls>
+        <a-entity id="rig" position="0 0 2" movement-controls="speed: 0.1; fly: false; constrainToNavMesh: true">
+            <a-camera position="0 1.6 0" look-controls="pointerLockEnabled: false">
                 <a-cursor 
                     color="#ff0000" 
                     fuse="true" 

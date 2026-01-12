@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Nível 3 - Descubra o Código</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
         #hud {
@@ -86,6 +87,18 @@
             margin: 10px 0;
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .setting-row span {
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        #vol-display {
+            color: #00ff00;
+            font-weight: bold;
+            min-width: 50px;
         }
         .toggle {
             position: relative;
@@ -181,8 +194,8 @@
     <a-scene>
         <a-sky color="#000"></a-sky>
         
-        <!-- Chão -->
-        <a-plane position="0 0 0" rotation="-90 0 0" width="12" height="12" color="#0a0a0a"></a-plane>
+        <!-- Chão com nav-mesh (ligeiramente menor que as paredes) -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="11" height="11" color="#0a0a0a" nav-mesh></a-plane>
         
         <!-- Paredes -->
         <a-box position="0 2 -6" width="12" height="4" depth="0.2" color="#1a1a1a"></a-box>
@@ -225,8 +238,8 @@
         <a-light type="point" position="0 3.5 0" intensity="1" color="#ffffff"></a-light>
         
         <!-- Camera -->
-        <a-entity position="0 1.6 5">
-            <a-camera wasd-controls look-controls>
+        <a-entity id="rig" position="0 0 5" movement-controls="speed: 0.1; fly: false; constrainToNavMesh: true">
+            <a-camera position="0 1.6 0" look-controls="pointerLockEnabled: false">
                 <a-cursor 
                     color="#00ff00" 
                     fuse="true" 
