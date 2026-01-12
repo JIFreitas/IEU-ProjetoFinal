@@ -17,7 +17,7 @@
   <body>
     <div id="hud">
       <div>Velas: <span id="candles">0</span>/4</div>
-      <div id="msg">Acenda as velas na ordem: 1 → 2 → 3 → 4</div>
+      <div id="msg">Procura o isqueiro e segue a pista do quadro.</div>
       <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
@@ -66,6 +66,7 @@
     <a-scene>
       <a-sky color="#050505"></a-sky>
 
+      <!-- Chão -->
       <a-plane
         position="0 0 -5"
         rotation="-90 0 0"
@@ -75,6 +76,7 @@
         nav-mesh
       ></a-plane>
 
+      <!-- Paredes corredor -->
       <a-box
         position="-2.5 2 -5"
         width="0.2"
@@ -104,6 +106,7 @@
         color="#3a2510"
       ></a-box>
 
+      <!-- Teto -->
       <a-plane
         position="0 4 -5"
         rotation="90 0 0"
@@ -112,13 +115,65 @@
         color="#0a0a0a"
       ></a-plane>
 
-      <!-- Velas (igual ao teu) -->
-      <!-- ... (mantive tudo igual, só removi o script do head) ... -->
+      <!-- QUADRO (clicável) -->
+      <a-entity
+        id="order-board"
+        class="interactable"
+        position="2.35 2.2 -9"
+        rotation="0 -90 0"
+      >
+        <a-plane
+          class="interactable"
+          width="4.5"
+          height="1.5"
+          color="#2b1b10"
+        ></a-plane>
 
+        <a-text
+          class="interactable"
+          value="ORDEM DOS ELEMENTOS"
+          position="0 0.35 0.01"
+          align="center"
+          color="#d8c7a6"
+          width="6"
+        ></a-text>
+
+        <!-- Texto escondido (aparece ao clicar) -->
+        <a-text
+          id="order-text"
+          value="2 → 4 → 1 → 3"
+          visible="false"
+          position="0 -0.25 0.01"
+          align="center"
+          color="#ffffaa"
+          width="6"
+        ></a-text>
+      </a-entity>
+
+      <!-- ISQUEIRO (clicável) -->
+      <a-box
+        id="lighter"
+        class="interactable"
+        position="0 0.6 -2"
+        width="0.25"
+        height="0.08"
+        depth="0.12"
+        color="#cfcfcf"
+        animation="property: rotation; to: 0 360 0; loop: true; dur: 3500"
+      ></a-box>
+      <a-text
+        value="?"
+        position="0 0.9 -2"
+        align="center"
+        color="#ffffff"
+        width="3"
+      ></a-text>
+
+      <!-- Velas -->
       <a-entity position="-1 1.5 -8">
         <a-cylinder
           id="candle1"
-          class="candle"
+          class="candle interactable"
           radius="0.1"
           height="0.5"
           color="#8b4513"
@@ -133,7 +188,6 @@
         ></a-text>
         <a-sphere
           id="flame1"
-          class="flame"
           visible="false"
           position="0 0.4 0"
           radius="0.15"
@@ -145,7 +199,7 @@
       <a-entity position="1 1.5 -8">
         <a-cylinder
           id="candle2"
-          class="candle"
+          class="candle interactable"
           radius="0.1"
           height="0.5"
           color="#8b4513"
@@ -160,7 +214,6 @@
         ></a-text>
         <a-sphere
           id="flame2"
-          class="flame"
           visible="false"
           position="0 0.4 0"
           radius="0.15"
@@ -172,7 +225,7 @@
       <a-entity position="-1 1.5 -12">
         <a-cylinder
           id="candle3"
-          class="candle"
+          class="candle interactable"
           radius="0.1"
           height="0.5"
           color="#8b4513"
@@ -187,7 +240,6 @@
         ></a-text>
         <a-sphere
           id="flame3"
-          class="flame"
           visible="false"
           position="0 0.4 0"
           radius="0.15"
@@ -199,7 +251,7 @@
       <a-entity position="1 1.5 -12">
         <a-cylinder
           id="candle4"
-          class="candle"
+          class="candle interactable"
           radius="0.1"
           height="0.5"
           color="#8b4513"
@@ -214,7 +266,6 @@
         ></a-text>
         <a-sphere
           id="flame4"
-          class="flame"
           visible="false"
           position="0 0.4 0"
           radius="0.15"
@@ -223,8 +274,10 @@
         ></a-sphere>
       </a-entity>
 
+      <!-- Porta -->
       <a-box
         id="door"
+        class="interactable"
         position="0 2 -15"
         width="2"
         height="3"
@@ -232,6 +285,7 @@
         color="#663300"
       ></a-box>
 
+      <!-- Luz -->
       <a-light type="ambient" intensity="0.2"></a-light>
       <a-light
         type="point"
@@ -240,6 +294,7 @@
         color="#ffaa66"
       ></a-light>
 
+      <!-- Rig -->
       <a-entity
         id="rig"
         position="0 0 2"
@@ -255,7 +310,7 @@
             color="#ff0000"
             fuse="true"
             fuse-timeout="800"
-            raycaster="objects: .candle, #door"
+            raycaster="objects: .interactable"
           ></a-cursor>
         </a-camera>
       </a-entity>
