@@ -19,6 +19,10 @@
       <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
+    <div id="timer-top" class="timer-top" aria-label="Tempo restante">
+      <span id="timer-text">00:00</span>
+    </div>
+
     <div id="pause-menu" class="theme-red">
       <h2>JOGO PAUSADO</h2>
 
@@ -196,6 +200,15 @@
       const keysSpan = document.getElementById("keys");
       const msgDiv = document.getElementById("msg");
 
+      startLevelTimer({
+        seconds: 90,
+        onTimeout: () => {
+          msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
+          msgDiv.style.color = "#ff0000";
+          setTimeout(() => location.reload(), 1500);
+        },
+      });
+
       // Sistema de pegar chaves
       AFRAME.registerComponent("key-pickup", {
         init: function () {
@@ -242,13 +255,9 @@
               });
 
               setTimeout(() => {
+                stopLevelTimer();
                 unlockLevel(2);
                 window.location.href = "nivel2-simples.html";
-                unlockLevel(2);
-                console.log(
-                  "unlockedLevel agora =",
-                  localStorage.getItem("unlockedLevel")
-                );
               }, 2000);
             } else {
               msgDiv.textContent = `Você precisa de ${3 - keysFound} chaves!`;
@@ -262,7 +271,6 @@
         },
       });
 
-      // Adiciona componentes
       document
         .querySelectorAll(".key")
         .forEach((key) => key.setAttribute("key-pickup", ""));

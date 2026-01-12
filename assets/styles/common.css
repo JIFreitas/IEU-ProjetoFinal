@@ -1,6 +1,13 @@
 /* ========= Base ========= */
-* { box-sizing: border-box; }
-body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
 
 /* ========= HUD ========= */
 #hud {
@@ -9,7 +16,7 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
   left: 20px;
   color: white;
   font-size: 20px;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   padding: 15px;
   border-radius: 10px;
   z-index: 1000;
@@ -28,11 +35,11 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.95);
+  background: rgba(0, 0, 0, 0.95);
   padding: 40px;
   border-radius: 20px;
-  border: 3px solid #ff0000;              
-  box-shadow: 0 0 50px rgba(255,0,0,0.8);  
+  border: 3px solid #ff0000;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
   z-index: 2000;
   display: none;
   text-align: center;
@@ -41,18 +48,36 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
 
 #pause-menu h2 {
   margin-bottom: 30px;
-  color: #ff0000; 
+  color: #ff0000;
 }
 
 /* Variações de tema por nível (opcional) */
-#pause-menu.theme-red   { border-color: #ff0000; box-shadow: 0 0 50px rgba(255,0,0,0.8); }
-#pause-menu.theme-red h2 { color: #ff0000; }
+#pause-menu.theme-red {
+  border-color: #ff0000;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
+}
 
-#pause-menu.theme-orange { border-color: #ff6600; box-shadow: 0 0 50px rgba(255,102,0,0.8); }
-#pause-menu.theme-orange h2 { color: #ff6600; }
+#pause-menu.theme-red h2 {
+  color: #ff0000;
+}
 
-#pause-menu.theme-green { border-color: #00ff00; box-shadow: 0 0 50px rgba(0,255,0,0.8); }
-#pause-menu.theme-green h2 { color: #00ff00; }
+#pause-menu.theme-orange {
+  border-color: #ff6600;
+  box-shadow: 0 0 50px rgba(255, 102, 0, 0.8);
+}
+
+#pause-menu.theme-orange h2 {
+  color: #ff6600;
+}
+
+#pause-menu.theme-green {
+  border-color: #00ff00;
+  box-shadow: 0 0 50px rgba(0, 255, 0, 0.8);
+}
+
+#pause-menu.theme-green h2 {
+  color: #00ff00;
+}
 
 /* ========= Botões ========= */
 .menu-btn {
@@ -74,14 +99,32 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
 }
 
 /* Variações de cor (usa classes no HTML se quiseres) */
-.btn-red   { background: #330000; border-color: #ff0000; }
-.btn-red:hover { background: #660000; }
+.btn-red {
+  background: #330000;
+  border-color: #ff0000;
+}
 
-.btn-orange { background: #331a00; border-color: #ff6600; }
-.btn-orange:hover { background: #663300; }
+.btn-red:hover {
+  background: #660000;
+}
 
-.btn-green { background: #003300; border-color: #00ff00; }
-.btn-green:hover { background: #006600; }
+.btn-orange {
+  background: #331a00;
+  border-color: #ff6600;
+}
+
+.btn-orange:hover {
+  background: #663300;
+}
+
+.btn-green {
+  background: #003300;
+  border-color: #00ff00;
+}
+
+.btn-green:hover {
+  background: #006600;
+}
 
 /* ========= Rows / Toggles ========= */
 .setting-row {
@@ -90,7 +133,7 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
   justify-content: space-between;
   padding: 15px;
   margin: 10px 0;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   color: #fff;
   font-size: 20px;
@@ -99,7 +142,7 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
 
 .setting-row span {
   color: #fff;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 #vol-display {
@@ -118,7 +161,9 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
   transition: background 0.2s;
 }
 
-.toggle.active { background: #00ff00; }
+.toggle.active {
+  background: #00ff00;
+}
 
 .toggle-slider {
   position: absolute;
@@ -131,7 +176,51 @@ body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
   transition: left 0.2s;
 }
 
-.toggle.active .toggle-slider { left: 32px; }
+.toggle.active .toggle-slider {
+  left: 32px;
+}
 
 /* Slider */
-input[type="range"] { width: 180px; cursor: pointer; }
+input[type="range"] {
+  width: 180px;
+  cursor: pointer;
+}
+
+/* ===== TIMER TOP ===== */
+#timer-top.timer-top,
+.timer-top {
+  position: fixed !important;
+  top: 16px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  z-index: 999999 !important;
+  pointer-events: none !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+  padding: 6px 14px !important;
+  border-radius: 10px !important;
+
+  background: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* o texto em si */
+#timer-text {
+  font-size: 44px !important;
+  font-weight: 900 !important;
+  letter-spacing: 2px !important;
+  line-height: 1 !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.95) !important;
+}
+
+/* quando faltam <= 20s (classe adicionada pelo JS ao #timer-top) */
+#timer-top.warning #timer-text {
+  color: #ff0000 !important;
+  text-shadow: 0 0 16px rgba(255, 0, 0, 0.95), 0 0 14px rgba(0, 0, 0, 0.95) !important;
+}

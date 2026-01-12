@@ -83,6 +83,10 @@
       <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
+    <div id="timer-top" class="timer-top" aria-label="Tempo restante">
+      <span id="timer-text">00:00</span>
+    </div>
+
     <div id="pause-menu" class="theme-green">
       <h2>JOGO PAUSADO</h2>
 
@@ -319,6 +323,15 @@
       const cluesSpan = document.getElementById("clues");
       const msgDiv = document.getElementById("msg");
 
+      startLevelTimer({
+        seconds: 150,
+        onTimeout: () => {
+          msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
+          msgDiv.style.color = "#ff0000";
+          setTimeout(() => location.reload(), 1500);
+        },
+      });
+
       AFRAME.registerComponent("clue-finder", {
         init: function () {
           this.el.addEventListener("click", () => {
@@ -390,8 +403,9 @@
             '<h2 style="color: #00ff00;">✓ CÓDIGO CORRETO!</h2><p>PARABÉNS! VOCÊ ESCAPOU!</p>';
 
           setTimeout(() => {
+            stopLevelTimer();
             alert("🎉 VOCÊ COMPLETOU TODOS OS NÍVEIS! 🎉");
-            resetProgress(); // <- isto
+            resetProgress();
             window.location.href = "../index-simples.html";
           }, 2000);
         } else {

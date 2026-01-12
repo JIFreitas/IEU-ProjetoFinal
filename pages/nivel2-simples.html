@@ -19,6 +19,10 @@
       <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
+    <div id="timer-top" class="timer-top" aria-label="Tempo restante">
+      <span id="timer-text">00:00</span>
+    </div>
+
     <div id="pause-menu" class="theme-orange">
       <h2>JOGO PAUSADO</h2>
 
@@ -264,13 +268,20 @@
     </audio>
 
     <script>
-      console.log("unlockedLevel no nível 2 =", localStorage.getItem("unlockedLevel"));
       requireUnlockedLevel(2, "../index-simples.html");
-      
+
       let candlesLit = 0;
       const candlesSpan = document.getElementById("candles");
       const msgDiv = document.getElementById("msg");
 
+      startLevelTimer({
+        seconds: 120,
+        onTimeout: () => {
+          msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
+          msgDiv.style.color = "#ff0000";
+          setTimeout(() => location.reload(), 1500);
+        },
+      });
 
       AFRAME.registerComponent("candle-light", {
         init: function () {
@@ -332,7 +343,8 @@
               });
 
               setTimeout(() => {
-                unlockLevel(3); 
+                stopLevelTimer();
+                unlockLevel(3);
                 window.location.href = "nivel3-simples.html";
               }, 2000);
             } else {

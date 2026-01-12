@@ -154,12 +154,135 @@ function togglePause() {
     if (__isPaused && __musicPlaying) music.pause();
     else applyMusicSettingsToAudio();
   }
+
+  // (opcional) refrescar o timer visual quando fazes pausa/retomas
+  if (window.__levelTimer && typeof window.__levelTimer.render === "function") {
+    window.__levelTimer.render();
+  }
 }
 
 function disableCameraWASD() {
   const cam = document.querySelector("a-camera");
   if (cam) cam.setAttribute("wasd-controls", "enabled: false");
 }
+
+// ---------- Timer (por nível) ----------
+(function () {
+  const state = {
+    running: false,
+    remainingMs: 0,
+    lastTick: 0,
+    intervalId: null,
+    onTimeout: null,
+    displayEl: null,
+
+    // NOVO (para o vermelho + topo)
+    timerTopEl: null,
+    warningAt: 20,
+  };
+
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function getDisplayEl(displayId) {
+    return document.getElementById(displayId) || null;
+  }
+
+  function render() {
+    const totalSeconds = Math.max(0, Math.ceil(state.remainingMs / 1000));
+    const mm = pad2(Math.floor(totalSeconds / 60));
+    const ss = pad2(totalSeconds % 60);
+
+    if (state.displayEl) state.displayEl.textContent = `${mm}:${ss}`;
+
+    // vermelho quando faltam <= warningAt (por defeito 20s)
+    if (state.timerTopEl) {
+      state.timerTopEl.classList.toggle("warning", totalSeconds <= state.warningAt);
+    }
+  }
+
+  function stop() {
+    state.running = false;
+    if (state.intervalId) {
+      clearInterval(state.intervalId);
+      state.intervalId = null;
+    }
+  }
+
+  function tick() {
+    if (!state.running) return;
+
+    // Se estiver pausado, congela o relógio
+    if (__isPaused) {
+      state.lastTick = performance.now();
+      return;
+    }
+
+    const now = performance.now();
+    const dt = now - state.lastTick;
+    state.lastTick = now;
+
+    state.remainingMs -= dt;
+
+    if (state.remainingMs <= 0) {
+      state.remainingMs = 0;
+      render();
+      stop();
+      if (typeof state.onTimeout === "function") state.onTimeout();
+      return;
+    }
+
+    render();
+  }
+
+  // API pública
+  window.startLevelTimer = function ({
+    seconds,
+    displayId = "timer-text", // texto do topo
+    onTimeout,
+    warningAt = 20,
+  }) {
+    if (typeof seconds !== "number" || seconds <= 0) return;
+
+    stop();
+
+    state.displayEl =
+      document.getElementById(displayId) ||
+      document.getElementById("timer-text") ||
+      getDisplayEl(displayId);
+
+    state.timerTopEl = document.getElementById("timer-top") || null;
+
+    state.onTimeout = onTimeout;
+    state.warningAt = warningAt;
+
+    state.remainingMs = seconds * 1000;
+    state.lastTick = performance.now();
+    state.running = true;
+
+    render();
+    state.intervalId = setInterval(tick, 250);
+  };
+
+  window.stopLevelTimer = function () {
+    stop();
+  };
+
+  // para debug/controlo
+  window.__levelTimer = {
+    render,
+    stop,
+    get remainingMs() {
+      return state.remainingMs;
+    },
+  };
+
+  // segurança: ao sair da página, parar
+  window.addEventListener("beforeunload", () => {
+    stop();
+  });
+})();
 
 // ---------- Init ----------
 window.addEventListener("DOMContentLoaded", () => {
@@ -179,3 +302,4 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
