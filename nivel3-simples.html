@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Nível 3 - Descubra o Código</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: Arial;
+            font-size: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        #music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            border: 3px solid #00ff00;
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 1000;
+            transition: all 0.3s;
+            animation: pulse-btn 2s infinite;
+        }
+        #music-control:hover {
+            background: rgba(0,255,0,0.5);
+            transform: scale(1.1);
+        }
+        @keyframes pulse-btn {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,255,0,0.5); }
+            50% { box-shadow: 0 0 20px rgba(0,255,0,0.8); }
+        }
+        #pause-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #00ff00;
+            box-shadow: 0 0 50px rgba(0,255,0,0.8);
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            min-width: 400px;
+        }
+        #pause-menu h2 {
+            color: #00ff00;
+            margin-bottom: 30px;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 18px;
+            background: #003300;
+            color: white;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .menu-btn:hover {
+            background: #006600;
+            transform: scale(1.05);
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #666;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle.active {
+            background: #00ff00;
+        }
+        .toggle-slider {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        .toggle.active .toggle-slider {
+            left: 32px;
+        }
+        #code-input {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            z-index: 2000;
+        }
+        #code-input input {
+            font-size: 36px;
+            width: 200px;
+            text-align: center;
+            padding: 10px;
+            letter-spacing: 10px;
+            border: 2px solid #00ff00;
+            background: #000;
+            color: #00ff00;
+        }
+        #code-input button {
+            font-size: 24px;
+            padding: 10px 30px;
+            margin-top: 15px;
+            background: #00ff00;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div>Pistas: <span id="clues">0</span>/4</div>
+        <div id="msg">Encontre 4 pistas para descobrir o código!</div>        
+        <div style="margin-top: 10px; font-size: 14px; color: #888;">Pressione ESC para pausar</div>
+    </div>
+    
+    <div id="pause-menu">
+        <h2>JOGO PAUSADO</h2>
+        <div class="setting-row">
+            <span>Música:</span>
+            <div class="toggle active" id="music-toggle" onclick="togglePauseMusic()">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span>Volume:</span>
+            <input type="range" min="0" max="100" value="40" id="volume-control" oninput="updatePauseVolume(this.value)">
+            <span id="vol-display">40%</span>
+        </div>
+        <button class="menu-btn" onclick="resumeGame()">Continuar</button>
+        <button class="menu-btn" onclick="window.location.href='index-simples.html'">Menu Principal</button>    </div>
+    
+    <div id="music-control" onclick="toggleMusic()">Clique para Música</div>
+    
+    <div id="code-input">
+        <h2 style="color: #00ff00;">Digite o código de 4 dígitos:</h2>
+        <input type="text" id="code" maxlength="4" placeholder="????">
+        <br>
+        <button onclick="checkCode()">Confirmar</button>
+        <div id="code-msg" style="margin-top: 15px; color: white;"></div>
+    </div>
+
+    <a-scene>
+        <a-sky color="#000"></a-sky>
+        
+        <!-- Chão -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="12" height="12" color="#0a0a0a"></a-plane>
+        
+        <!-- Paredes -->
+        <a-box position="0 2 -6" width="12" height="4" depth="0.2" color="#1a1a1a"></a-box>
+        <a-box position="-6 2 0" width="0.2" height="4" depth="12" color="#1a1a1a"></a-box>
+        <a-box position="6 2 0" width="0.2" height="4" depth="12" color="#1a1a1a"></a-box>
+        <a-box position="0 2 6" width="12" height="4" depth="0.2" color="#1a1a1a"></a-box>
+        
+        <!-- PISTAS (cubos coloridos grandes) -->
+        <a-entity position="-3 1.5 -4">
+            <a-box id="clue1" class="clue" data-digit="3" width="0.8" height="0.8" depth="0.8" color="#ff0000"
+                   animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="?" position="0 0.8 0" align="center" color="#ffffff" width="5"></a-text>
+        </a-entity>
+        
+        <a-entity position="3 1.5 -4">
+            <a-box id="clue2" class="clue" data-digit="7" width="0.8" height="0.8" depth="0.8" color="#00ff00"
+                   animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="?" position="0 0.8 0" align="center" color="#ffffff" width="5"></a-text>
+        </a-entity>
+        
+        <a-entity position="-3 1.5 3">
+            <a-box id="clue3" class="clue" data-digit="1" width="0.8" height="0.8" depth="0.8" color="#0000ff"
+                   animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="?" position="0 0.8 0" align="center" color="#ffffff" width="5"></a-text>
+        </a-entity>
+        
+        <a-entity position="3 1.5 3">
+            <a-box id="clue4" class="clue" data-digit="9" width="0.8" height="0.8" depth="0.8" color="#ffff00"
+                   animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+            <a-text value="?" position="0 0.8 0" align="center" color="#ffffff" width="5"></a-text>
+        </a-entity>
+        
+        <!-- Terminal no centro -->
+        <a-box id="terminal" class="terminal" position="0 1.5 0" width="1" height="1.5" depth="0.3" color="#333333">
+            <a-text value="TERMINAL\n[TRANCADO]" position="0 0 0.16" align="center" color="#00ff00" width="2"></a-text>
+        </a-box>
+        
+        <!-- Luz -->
+        <a-light type="ambient" intensity="0.4"></a-light>
+        <a-light type="point" position="0 3.5 0" intensity="1" color="#ffffff"></a-light>
+        
+        <!-- Camera -->
+        <a-entity position="0 1.6 5">
+            <a-camera wasd-controls look-controls>
+                <a-cursor 
+                    color="#00ff00" 
+                    fuse="true" 
+                    fuse-timeout="800"
+                    raycaster="objects: .clue, .terminal"></a-cursor>
+            </a-camera>
+        </a-entity>
+    </a-scene>
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="sounds/musica-ambiente.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let cluesFound = 0;
+        let code = '';
+        const correctCode = '3719';
+        const cluesSpan = document.getElementById('clues');
+        const msgDiv = document.getElementById('msg');
+        const bgMusic = document.getElementById('bg-music');
+        let musicPlaying = false;
+        let isPaused = false;
+        
+        // Carrega configurações
+        let musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
+        let musicVolume = parseInt(localStorage.getItem('musicVolume') || '40');
+        bgMusic.volume = musicVolume / 100;
+        
+        // Inicia música se habilitada
+        if (musicEnabled) {
+            bgMusic.play().catch(err => console.log('Música aguardando interação'));
+            musicPlaying = true;
+            document.getElementById('music-control').style.display = 'none';
+        }
+        
+        // Atualiza UI do menu de pausa
+        document.getElementById('music-toggle').classList.toggle('active', musicEnabled);
+        document.getElementById('volume-control').value = musicVolume;
+        document.getElementById('vol-display').textContent = musicVolume + '%';
+        
+        // Menu de pausa (ESC)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('code-input').style.display !== 'block') {
+                isPaused = !isPaused;
+                document.getElementById('pause-menu').style.display = isPaused ? 'block' : 'none';
+                if (isPaused && musicPlaying) {
+                    bgMusic.pause();
+                } else if (!isPaused && musicEnabled) {
+                    bgMusic.play();
+                }
+            }
+        });
+        
+        function resumeGame() {
+            isPaused = false;
+            document.getElementById('pause-menu').style.display = 'none';
+            if (musicEnabled) bgMusic.play();
+        }
+        
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem('musicEnabled', musicEnabled);
+            if (musicEnabled) {
+                bgMusic.play();
+                musicPlaying = true;
+                document.getElementById('music-control').style.display = 'none';
+            } else {
+                bgMusic.pause();
+                musicPlaying = false;
+            }
+        }
+        
+        function togglePauseMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem('musicEnabled', musicEnabled);
+            document.getElementById('music-toggle').classList.toggle('active', musicEnabled);
+            if (musicEnabled) {
+                bgMusic.play();
+                musicPlaying = true;
+            } else {
+                bgMusic.pause();
+                musicPlaying = false;
+            }
+        }
+        
+        function updatePauseVolume(value) {
+            musicVolume = parseInt(value);
+            localStorage.setItem('musicVolume', musicVolume);
+            bgMusic.volume = musicVolume / 100;
+            document.getElementById('vol-display').textContent = value + '%';
+        }
+        
+        AFRAME.registerComponent('clue-finder', {
+            init: function() {
+                this.el.addEventListener('click', () => {
+                    if (!this.found) {
+                        this.found = true;
+                        cluesFound++;
+                        cluesSpan.textContent = cluesFound;
+                        
+                        const digit = this.el.getAttribute('data-digit');
+                        code += digit;
+                        
+                        // Mostra dígito
+                        const parent = this.el.parentElement;
+                        const text = parent.querySelector('a-text');
+                        text.setAttribute('value', digit);
+                        text.setAttribute('color', '#00ff00');
+                        
+                        msgDiv.textContent = `Pista encontrada: ${digit}`;
+                        msgDiv.style.color = '#00ff00';
+                        
+                        if (cluesFound === 4) {
+                            setTimeout(() => {
+                                msgDiv.textContent = 'TODAS AS PISTAS! Clique no terminal!';
+                                msgDiv.style.fontSize = '24px';
+                                document.getElementById('terminal').classList.add('unlocked');
+                                document.querySelector('#terminal a-text').setAttribute('value', 'TERMINAL\n[CLIQUE AQUI]');
+                                document.querySelector('#terminal a-text').setAttribute('color', '#ffff00');
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                msgDiv.textContent = `${4 - cluesFound} pistas restantes`;
+                                msgDiv.style.color = 'white';
+                            }, 2000);
+                        }
+                    }
+                });
+            }
+        });
+        
+        AFRAME.registerComponent('terminal-system', {
+            init: function() {
+                this.el.addEventListener('click', () => {
+                    console.log('Terminal clicado! Pistas:', cluesFound);
+                    if (cluesFound === 4) {
+                        document.getElementById('code-input').style.display = 'block';
+                        document.getElementById('code').focus();
+                    } else {
+                        msgDiv.textContent = 'Terminal trancado! Encontre todas as pistas!';
+                        msgDiv.style.color = '#ff0000';
+                        setTimeout(() => {
+                            msgDiv.textContent = `Pistas: ${cluesFound}/4`;
+                            msgDiv.style.color = 'white';
+                        }, 2000);
+                    }
+                });
+            }
+        });
+        
+        function checkCode() {
+            const input = document.getElementById('code').value;
+            const codeMsg = document.getElementById('code-msg');
+            
+            if (input === correctCode) {
+                codeMsg.innerHTML = '<h2 style="color: #00ff00;">✓ CÓDIGO CORRETO!</h2><p>PARABÉNS! VOCÊ ESCAPOU!</p>';
+                setTimeout(() => {
+                    alert('🎉 VOCÊ COMPLETOU TODOS OS NÍVEIS! 🎉');
+                    window.location.href = 'index-simples.html';
+                }, 2000);
+            } else {
+                codeMsg.innerHTML = '<p style="color: #ff0000;">✗ Código errado! Tente novamente.</p>';
+                document.getElementById('code').value = '';
+            }
+        }
+        
+        // Enter para confirmar
+        document.getElementById('code').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkCode();
+        });
+        
+        document.querySelectorAll('.clue').forEach(clue => {
+            clue.setAttribute('clue-finder', '');
+        });
+        document.getElementById('terminal').setAttribute('terminal-system', '');
+    </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Nível 1 - Encontre 3 Chaves</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: Arial;
+            font-size: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        #pause-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 50px rgba(255,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            min-width: 400px;
+        }
+        #pause-menu h2 {
+            color: #ff0000;
+            margin-bottom: 30px;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 18px;
+            background: #330000;
+            color: white;
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .menu-btn:hover {
+            background: #660000;
+            transform: scale(1.05);
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #666;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle.active {
+            background: #00ff00;
+        }
+        .toggle-slider {
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+        .toggle.active .toggle-slider {
+            left: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div>Chaves: <span id="keys">0</span>/3</div>
+        <div id="msg">Encontre 3 chaves para abrir a porta!</div>
+        <div style="margin-top: 10px; font-size: 14px; color: #888;">Pressione ESC para pausar</div>
+    </div>
+    
+    <div id="pause-menu">
+        <h2>JOGO PAUSADO</h2>
+        <div class="setting-row">
+            <span>Música:</span>
+            <div class="toggle active" id="music-toggle" onclick="togglePauseMusic()">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span>Volume:</span>
+            <input type="range" min="0" max="100" value="40" id="volume-control" oninput="updatePauseVolume(this.value)">
+            <span id="vol-display">40%</span>
+        </div>
+        <button class="menu-btn" onclick="resumeGame()">Continuar</button>
+        <button class="menu-btn" onclick="window.location.href='index-simples.html'">Menu Principal</button>
+    </div>
+
+    <a-scene>
+        <a-sky color="#111"></a-sky>
+        
+        <!-- Chão -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="15" height="15" color="#2a1810"></a-plane>
+        
+        <!-- Paredes -->
+        <a-box position="0 2 -7" width="15" height="4" depth="0.2" color="#4a3020"></a-box>
+        <a-box position="-7 2 0" width="0.2" height="4" depth="15" color="#4a3020"></a-box>
+        <a-box position="7 2 0" width="0.2" height="4" depth="15" color="#4a3020"></a-box>
+        
+        <!-- Teto -->
+        <a-plane position="0 4 0" rotation="90 0 0" width="15" height="15" color="#1a1410"></a-plane>
+        
+        <!-- CHAVES (grandes e brilhantes) -->
+        <a-sphere id="key1" class="key" position="-4 1.5 -5" radius="0.3" color="#FFD700" 
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"
+                  animation__pulse="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 500"></a-sphere>
+        
+        <a-sphere id="key2" class="key" position="4 1.5 -5" radius="0.3" color="#FFD700" 
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"
+                  animation__pulse="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 500"></a-sphere>
+        
+        <a-sphere id="key3" class="key" position="0 1.5 -6" radius="0.3" color="#FFD700" 
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 3000"
+                  animation__pulse="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 500"></a-sphere>
+        
+        <!-- Porta (trancada) -->
+        <a-box id="door" position="0 2 -6.9" width="2" height="3" depth="0.1" color="#663300"></a-box>
+        <a-text id="door-text" value="PORTA TRANCADA" position="0 3.5 -6.8" align="center" color="#ff0000" width="5"></a-text>
+        
+        <!-- Luz -->
+        <a-light type="ambient" intensity="0.3"></a-light>
+        <a-light type="point" position="0 3 0" intensity="0.8" color="#ffaa66"></a-light>
+        
+        <!-- Camera com cursor -->
+        <a-entity id="player" position="0 1.6 5">
+            <a-camera wasd-controls look-controls>
+                <a-cursor 
+                    color="#ff0000" 
+                    fuse="true" 
+                    fuse-timeout="800"
+                    raycaster="objects: .key, #door"></a-cursor>
+            </a-camera>
+        </a-entity>
+    </a-scene>
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="sounds/musica-ambiente.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let keysFound = 0;
+        const keysSpan = document.getElementById('keys');
+        const msgDiv = document.getElementById('msg');
+        const bgMusic = document.getElementById('bg-music');
+        let musicPlaying = false;
+        let isPaused = false;
+        
+        // Carrega configurações
+        let musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
+        let musicVolume = parseInt(localStorage.getItem('musicVolume') || '40');
+        bgMusic.volume = musicVolume / 100;
+        
+        // Inicia música se habilitada
+        if (musicEnabled) {
+            bgMusic.play().catch(err => console.log('Música aguardando interação'));
+            musicPlaying = true;
+        }
+        
+        // Atualiza UI do menu de pausa
+        document.getElementById('music-toggle').classList.toggle('active', musicEnabled);
+        document.getElementById('volume-control').value = musicVolume;
+        document.getElementById('vol-display').textContent = musicVolume + '%';
+        
+        // Menu de pausa (ESC)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                isPaused = !isPaused;
+                document.getElementById('pause-menu').style.display = isPaused ? 'block' : 'none';
+                document.querySelector('a-scene').components.renderer.pause = isPaused;
+                if (isPaused && musicPlaying) {
+                    bgMusic.pause();
+                } else if (!isPaused && musicEnabled) {
+                    bgMusic.play();
+                }
+            }
+        });
+        
+        function resumeGame() {
+            isPaused = false;
+            document.getElementById('pause-menu').style.display = 'none';
+            document.querySelector('a-scene').components.renderer.pause = false;
+            if (musicEnabled) bgMusic.play();
+        }
+        
+        function togglePauseMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem('musicEnabled', musicEnabled);
+            document.getElementById('music-toggle').classList.toggle('active', musicEnabled);
+            if (musicEnabled) {
+                bgMusic.play();
+                musicPlaying = true;
+            } else {
+                bgMusic.pause();
+                musicPlaying = false;
+            }
+        }
+        
+        function updatePauseVolume(value) {
+            musicVolume = parseInt(value);
+            localStorage.setItem('musicVolume', musicVolume);
+            bgMusic.volume = musicVolume / 100;
+            document.getElementById('vol-display').textContent = value + '%';
+        }
+        
+        // Sistema de pegar chaves
+        AFRAME.registerComponent('key-pickup', {
+            init: function() {
+                this.el.addEventListener('click', () => {
+                    if (!this.picked) {
+                        this.picked = true;
+                        keysFound++;
+                        keysSpan.textContent = keysFound;
+                        
+                        // Remove chave
+                        this.el.setAttribute('visible', 'false');
+                        
+                        // Feedback
+                        msgDiv.textContent = `Chave coletada! (${keysFound}/3)`;
+                        msgDiv.style.color = '#00ff00';
+                        
+                        // Verifica se pegou todas
+                        if (keysFound === 3) {
+                            setTimeout(() => {
+                                msgDiv.textContent = 'PORTA ABERTA! Clique nela!';
+                                document.getElementById('door').classList.add('unlocked');
+                            }, 500);
+                        } else {
+                            setTimeout(() => {
+                                msgDiv.textContent = 'Encontre as outras chaves!';
+                                msgDiv.style.color = 'white';
+                            }, 2000);
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Sistema de porta
+        AFRAME.registerComponent('door-system', {
+            init: function() {
+                this.el.addEventListener('click', () => {
+                    if (keysFound === 3) {
+                        msgDiv.textContent = 'NÍVEL CONCLUÍDO! Parabéns!';
+                        msgDiv.style.color = '#00ff00';
+                        msgDiv.style.fontSize = '24px';
+                        
+                        // Abre porta
+                        this.el.setAttribute('animation', {
+                            property: 'position',
+                            to: '0 5 -6.9',
+                            dur: 1000
+                        });
+                        
+                        setTimeout(() => {
+                            window.location.href = 'nivel2-simples.html';
+                        }, 2000);
+                    } else {
+                        msgDiv.textContent = `Você precisa de ${3 - keysFound} chaves!`;
+                        msgDiv.style.color = '#ff0000';
+                        setTimeout(() => {
+                            msgDiv.textContent = 'Encontre as chaves!';
+                            msgDiv.style.color = 'white';
+                        }, 2000);
+                    }
+                });
+            }
+        });
+        
+        // Adiciona componentes
+        document.querySelectorAll('.key').forEach(key => {
+            key.setAttribute('key-pickup', '');
+        });
+        document.getElementById('door').setAttribute('door-system', '');
+    </script>
+</body>
+</html>
