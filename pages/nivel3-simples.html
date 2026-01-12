@@ -7,8 +7,9 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
 
-    <link rel="stylesheet" href="assets/styles/common.css" />
-    <script src="assets/scripts/common.js"></script>
+    <link rel="stylesheet" href="../assets/styles/common.css" />
+    <script src="../assets/scripts/common.js"></script>
+    <script src="../assets/scripts/game.js"></script>
 
     <!-- CSS específico do nível 3 (música + input do código) -->
     <style>
@@ -114,7 +115,7 @@
       </button>
       <button
         class="menu-btn btn-green"
-        onclick="window.location.href='index-simples.html'"
+        onclick="window.location.href='../index-simples.html'"
       >
         Menu Principal
       </button>
@@ -305,10 +306,12 @@
     </a-scene>
 
     <audio id="bg-music" loop preload="auto">
-      <source src="sounds/musica-ambiente.mp3" type="audio/mpeg" />
+      <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
     </audio>
 
     <script>
+      requireUnlockedLevel(3, "../index-simples.html");
+
       let cluesFound = 0;
       let code = "";
       const correctCode = "3719";
@@ -388,7 +391,8 @@
 
           setTimeout(() => {
             alert("🎉 VOCÊ COMPLETOU TODOS OS NÍVEIS! 🎉");
-            window.location.href = "index-simples.html";
+            resetProgress(); // <- isto
+            window.location.href = "../index-simples.html";
           }, 2000);
         } else {
           codeMsg.innerHTML =

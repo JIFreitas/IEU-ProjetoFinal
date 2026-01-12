@@ -7,8 +7,9 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
 
-    <link rel="stylesheet" href="assets/styles/common.css" />
-    <script src="assets/scripts/common.js"></script>
+    <link rel="stylesheet" href="../assets/styles/common.css" />
+    <script src="../assets/scripts/common.js"></script>
+    <script src="../assets/scripts/game.js"></script>
   </head>
 
   <body>
@@ -50,7 +51,7 @@
       </button>
       <button
         class="menu-btn btn-orange"
-        onclick="window.location.href='index-simples.html'"
+        onclick="window.location.href='../index-simples.html'"
       >
         Menu Principal
       </button>
@@ -259,13 +260,17 @@
     </a-scene>
 
     <audio id="bg-music" loop preload="auto">
-      <source src="sounds/musica-ambiente.mp3" type="audio/mpeg" />
+      <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
     </audio>
 
     <script>
+      console.log("unlockedLevel no nível 2 =", localStorage.getItem("unlockedLevel"));
+      requireUnlockedLevel(2, "../index-simples.html");
+      
       let candlesLit = 0;
       const candlesSpan = document.getElementById("candles");
       const msgDiv = document.getElementById("msg");
+
 
       AFRAME.registerComponent("candle-light", {
         init: function () {
@@ -327,6 +332,7 @@
               });
 
               setTimeout(() => {
+                unlockLevel(3); 
                 window.location.href = "nivel3-simples.html";
               }, 2000);
             } else {

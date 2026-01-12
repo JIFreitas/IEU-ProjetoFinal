@@ -15,6 +15,7 @@
 
     <!-- Common JS (settings em localStorage) -->
     <script src="assets/scripts/common.js"></script>
+    <script src="assets/scripts/game.js"></script>
   </head>
 
   <body>
@@ -30,7 +31,7 @@
     >
       <div class="settings-modal">
         <span class="close-settings" onclick="toggleSettings()">×</span>
-        <h3 style="color: #ff6600; margin-bottom: 20px">CONFIGURAÇÕES</h3>
+        <h3 class="settings-title">CONFIGURAÇÕES</h3>
 
         <div class="setting-item">
           <span>Música Ambiente:</span>
@@ -78,21 +79,41 @@
       </div>
 
       <div class="levels">
-        <a href="nivel1-simples.html" class="level-btn">
-          NÍVEL 1 - Entrada<br />
-          <small style="font-size: 16px">Encontre 3 chaves</small>
+        <a
+          id="btn-level-1"
+          href="pages/nivel1-simples.html"
+          class="level-btn"
+          data-level="1"
+        >
+          <span class="level-title">NÍVEL 1 - Entrada</span><br />
+          <small class="level-sub">Encontre 3 chaves</small>
         </a>
 
-        <a href="nivel2-simples.html" class="level-btn">
-          NÍVEL 2 - Corredor<br />
-          <small style="font-size: 16px">Acenda 4 velas na ordem</small>
+        <a
+          id="btn-level-2"
+          href="pages/nivel2-simples.html"
+          class="level-btn"
+          data-level="2"
+        >
+          <span class="lock-badge" aria-hidden="true">🔒</span>
+          <span class="level-title">NÍVEL 2 - Corredor</span><br />
+          <small class="level-sub">Acenda 4 velas na ordem</small>
         </a>
 
-        <a href="nivel3-simples.html" class="level-btn">
-          NÍVEL 3 - Sala Final<br />
-          <small style="font-size: 16px">Descubra o código secreto</small>
+        <a
+          id="btn-level-3"
+          href="pages/nivel3-simples.html"
+          class="level-btn"
+          data-level="3"
+        >
+          <span class="lock-badge" aria-hidden="true">🔒</span>
+          <span class="level-title">NÍVEL 3 - Sala Final</span><br />
+          <small class="level-sub">Descubra o código secreto</small>
         </a>
       </div>
+
+      <!-- Aviso (toast) quando clicas em nível bloqueado -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </div>
 
     <script>
@@ -131,8 +152,61 @@
         document.getElementById("volume-value").textContent = `${v}%`;
       }
 
+      // ===== Toast =====
+      let toastTimer = null;
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        if (!toast) return;
+
+        toast.textContent = message;
+        toast.classList.add("show");
+
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2200);
+      }
+
+      function preventLockedClick(e) {
+        e.preventDefault();
+
+        const a = e.currentTarget;
+        const level = a?.getAttribute("data-level") || "?";
+        showToast(
+          `🔒 O Nível ${level} ainda está bloqueado. Termina o nível anterior para o desbloquear.`
+        );
+      }
+
+      function setButtonLocked(a, locked) {
+        if (!a) return;
+
+        a.classList.toggle("locked", locked);
+        a.setAttribute("aria-disabled", locked ? "true" : "false");
+
+        if (locked) {
+          a.addEventListener("click", preventLockedClick);
+        } else {
+          a.removeEventListener("click", preventLockedClick);
+        }
+      }
+
+      function syncLevelButtons() {
+        const btn2 = document.getElementById("btn-level-2");
+        const btn3 = document.getElementById("btn-level-3");
+
+        const unlocked2 =
+          typeof isUnlockedLevel === "function" ? isUnlockedLevel(2) : false;
+        const unlocked3 =
+          typeof isUnlockedLevel === "function" ? isUnlockedLevel(3) : false;
+
+        setButtonLocked(btn2, !unlocked2);
+        setButtonLocked(btn3, !unlocked3);
+      }
+
       window.addEventListener("DOMContentLoaded", () => {
         syncIndexSettingsUI();
+        syncLevelButtons();
       });
     </script>
   </body>
