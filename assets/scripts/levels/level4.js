@@ -1,3 +1,4 @@
+// ../assets/scripts/levels/level4.js
 window.addEventListener("DOMContentLoaded", () => {
   requireUnlockedLevel(4, "../index-simples.html");
 
@@ -6,12 +7,8 @@ window.addEventListener("DOMContentLoaded", () => {
   let uvOn = false;
   let solved = false;
 
-  // mapa símbolo -> dígito (gerado no arranque)
-  // símbolos: TRI, CIR, SQR, X
   const SYMBOLS = ["TRI", "CIR", "SQR", "X"];
   const symbolToDigit = {};
-
-  // Ordem pedida no terminal (random)
   let terminalOrder = [];
 
   // ===== UI =====
@@ -40,6 +37,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function setMsg(text, color = "white", ms = 0, resetText = "") {
+    if (!msgDiv) return;
     msgDiv.textContent = text;
     msgDiv.style.color = color;
     if (ms > 0) {
@@ -50,7 +48,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ===== Timer (final: mais apertado) =====
+  // ===== Timer =====
   startLevelTimer({
     seconds: 140,
     onTimeout: () => {
@@ -59,7 +57,7 @@ window.addEventListener("DOMContentLoaded", () => {
     },
   });
 
-  // ===== Geração de código =====
+  // ===== Utils =====
   function randDigit() {
     return String(1 + Math.floor(Math.random() * 9));
   }
@@ -73,8 +71,33 @@ window.addEventListener("DOMContentLoaded", () => {
     return a;
   }
 
+  // ===== Pistas UV =====
+  const clueEls = {}; // { TRI: el, ... }
+  const clueOpacity = { TRI: 0, CIR: 0, SQR: 0, X: 0 };
+
+  function setClueOpacity(sym, next) {
+    const el = clueEls[sym];
+    if (!el) return;
+
+    const v = Math.max(0, Math.min(1, next));
+    clueOpacity[sym] = v;
+
+    // só visível com opacidade mínima
+    el.setAttribute("visible", v > 0.02 ? "true" : "false");
+    el.setAttribute("material", `transparent: true; opacity: ${v}`);
+  }
+
+  function hideAllClues() {
+    SYMBOLS.forEach((sym) => {
+      const el = clueEls[sym];
+      clueOpacity[sym] = 0;
+      if (!el) return;
+      el.setAttribute("visible", "false");
+      el.setAttribute("material", "transparent: true; opacity: 0");
+    });
+  }
+
   function initCode() {
-    // 4 dígitos aleatórios, um por símbolo
     const digits = shuffle([
       randDigit(),
       randDigit(),
@@ -83,17 +106,25 @@ window.addEventListener("DOMContentLoaded", () => {
     ]);
     SYMBOLS.forEach((s, i) => (symbolToDigit[s] = digits[i]));
 
-    // colocar no mundo (textos UV)
     SYMBOLS.forEach((sym) => {
       const el = document.getElementById(`uv-${sym}`);
       if (!el) return;
+
+      clueEls[sym] = el;
+
       el.setAttribute("value", `${sym}:${symbolToDigit[sym]}`);
-      el.setAttribute("visible", "false"); // só aparece com UV ligada
+
+      // blindagem (nunca aparece sem UV)
+      el.setAttribute("visible", "false");
+      el.setAttribute("material", "transparent: true; opacity: 0");
+
+      // opcional: melhora nitidez (se suportar)
+      try {
+        el.setAttribute("shader", "msdf");
+      } catch {}
     });
 
-    // ordem pedida no terminal (random)
     terminalOrder = shuffle(SYMBOLS);
-
     if (orderText) {
       orderText.textContent = "Ordem no terminal: " + terminalOrder.join(" → ");
     }
@@ -101,55 +132,151 @@ window.addEventListener("DOMContentLoaded", () => {
 
   initCode();
 
-  // ===== UV toggle =====
-  function applyUV() {
-    // mostra/esconde textos UV
-    SYMBOLS.forEach((sym) => {
-      const el = document.getElementById(`uv-${sym}`);
-      if (!el) return;
-      el.setAttribute("visible", uvOn ? "true" : "false");
-    });
+  // ===== UV Light / Feixe =====
+  const uvSpot = document.getElementById("uv-spot");
 
-    // mudar luz do ambiente (efeito “UV”)
-    const uvLight = document.getElementById("uv-light");
-    if (uvLight) uvLight.setAttribute("intensity", uvOn ? "0.85" : "0.0");
-
-    const normalLight = document.getElementById("normal-light");
-    if (normalLight)
-      normalLight.setAttribute("intensity", uvOn ? "0.12" : "0.55");
-
-    if (uvOn)
-      setMsg(
-        "🟣 UV ligada — procura inscrições nas paredes.",
-        "#d39bff",
-        1400,
-        "Procura inscrições UV e abre o terminal."
-      );
-    else setMsg("UV desligada.", "#cccccc", 900, "Procura a solução.");
+  function applyUVVisuals() {
+    // Mantém isto consistente com o teu HTML atual (mais alcance)
+    if (uvSpot) {
+      uvSpot.setAttribute("intensity", uvOn ? "4.2" : "0");
+      uvSpot.setAttribute("distance", "24");
+      uvSpot.setAttribute("decay", "0.6");
+      uvSpot.setAttribute("angle", "22");
+      uvSpot.setAttribute("penumbra", "0.35");
+    }
+    if (!uvOn) hideAllClues();
   }
 
   function toggleUV() {
-    if (!hasUV) return;
+    if (!hasUV) {
+      playSfx("sfx-hmm-reflexion", 0.7);
+      setMsg(
+        "❌ Precisas de apanhar a lanterna UV.",
+        "#ff4444",
+        1200,
+        "Encontra a lanterna UV."
+      );
+      return;
+    }
+
     uvOn = !uvOn;
-    applyUV();
-    playSfx("sfx-keys", 0.45); // clique/feedback
+    applyUVVisuals();
+    playSfx("sfx-keys", 0.45);
+
+    if (uvOn) {
+      setMsg(
+        "🟣 UV ligada — passa o feixe por cima das marcas.",
+        "#d39bff",
+        1400,
+        "Aponta às paredes para revelar o código."
+      );
+    } else {
+      setMsg("UV desligada.", "#cccccc", 900, "Procura a solução.");
+    }
   }
 
-  // tecla rápida (opcional) — não interfere com ESC
   document.addEventListener("keydown", (e) => {
-    if (e.key.toLowerCase() === "f") toggleUV();
+    if (e.key.toLowerCase() === "u") toggleUV();
   });
 
-  // ===== Terminal overlay =====
+  // ===== Revelar por “passar o feixe” =====
+  const REVEAL_RADIUS = 0.6; // mais fácil com o teu cenário
+  const FADE_IN = 0.25;
+  const FADE_OUT = 0.16;
+
+  const cursor = document.querySelector("a-cursor");
+
+  function dist(a, b) {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const dz = a.z - b.z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  function getWorldPos(el) {
+    // Evita crash se THREE ainda não estiver pronto
+    if (!el || !el.object3D || !window.THREE) return null;
+    return el.object3D.getWorldPosition(new THREE.Vector3());
+  }
+
+  let lastTick = 0;
+  function tickUV() {
+    requestAnimationFrame(tickUV);
+
+    const now = performance.now();
+    if (now - lastTick < 33) return; // ~30fps
+    lastTick = now;
+
+    if (!uvOn) return;
+
+    const rc = cursor?.components?.raycaster;
+    if (!rc) return;
+
+    const hits = rc.intersections || [];
+    const hit = hits[0];
+
+    // Se não bate em nada: fade out
+    if (!hit || !hit.point) {
+      SYMBOLS.forEach((sym) =>
+        setClueOpacity(sym, clueOpacity[sym] - FADE_OUT)
+      );
+      return;
+    }
+
+    // Não revelar se estás a apontar para um interactable (terminal, drawer, etc.)
+    const targetEl = hit.object?.el;
+    if (targetEl && targetEl.classList?.contains("interactable")) {
+      SYMBOLS.forEach((sym) =>
+        setClueOpacity(sym, clueOpacity[sym] - FADE_OUT)
+      );
+      return;
+    }
+
+    const p = hit.point;
+
+    // texto mais próximo do ponto do feixe
+    let bestSym = null;
+    let bestD = Infinity;
+
+    for (const sym of SYMBOLS) {
+      const el = clueEls[sym];
+      const wp = getWorldPos(el);
+      if (!wp) continue;
+
+      const d = dist(p, wp);
+      if (d < bestD) {
+        bestD = d;
+        bestSym = sym;
+      }
+    }
+
+    if (bestSym && bestD <= REVEAL_RADIUS) {
+      SYMBOLS.forEach((sym) => {
+        if (sym === bestSym) setClueOpacity(sym, clueOpacity[sym] + FADE_IN);
+        else setClueOpacity(sym, clueOpacity[sym] - FADE_OUT);
+      });
+    } else {
+      SYMBOLS.forEach((sym) =>
+        setClueOpacity(sym, clueOpacity[sym] - FADE_OUT)
+      );
+    }
+  }
+
+  hideAllClues();
+  tickUV();
+
+  // ===== Overlay do terminal =====
   function openCodeOverlay() {
     if (!overlay) return;
     overlay.style.display = "flex";
     overlay.setAttribute("aria-hidden", "false");
+
     if (codeMsg) {
       codeMsg.textContent = "";
       codeMsg.style.color = "#e8e8e8";
     }
-    const first = document.getElementById("code-slot-0");
+
+    const first = document.getElementById("term-slot-0");
     if (first) first.focus();
   }
 
@@ -160,14 +287,22 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function readSlot(i) {
-    const v = (document.getElementById(`code-slot-${i}`)?.value || "").trim();
+    const v = (document.getElementById(`term-slot-${i}`)?.value || "").trim();
     if (!v) return null;
     if (!/^\d$/.test(v)) return null;
     return v;
   }
 
+  function clearSlots() {
+    [0, 1, 2, 3].forEach((i) => {
+      const el = document.getElementById(`term-slot-${i}`);
+      if (el) el.value = "";
+    });
+  }
+
   function validateCode() {
     const slots = [0, 1, 2, 3].map(readSlot);
+
     if (slots.some((v) => v === null)) {
       playSfx("sfx-hmm-reflexion", 0.75);
       if (codeMsg) {
@@ -177,37 +312,33 @@ window.addEventListener("DOMContentLoaded", () => {
       return false;
     }
 
-    // compara pela ordem pedida
     const expected = terminalOrder.map((sym) => symbolToDigit[sym]);
     const ok = slots.every((v, i) => v === expected[i]);
 
     if (!ok) {
       playSfx("sfx-door-locked", 0.85);
+      clearSlots();
 
-      // pequena punição “profissional”: apaga inputs e baralha a ordem do terminal
-      [0, 1, 2, 3].forEach((i) => {
-        const el = document.getElementById(`code-slot-${i}`);
-        if (el) el.value = "";
-      });
       terminalOrder = shuffle(SYMBOLS);
-      if (orderText)
+      if (orderText) {
         orderText.textContent =
           "Ordem no terminal: " + terminalOrder.join(" → ");
+      }
 
       if (codeMsg) {
         codeMsg.style.color = "#ff4444";
         codeMsg.textContent = "✗ Errado. A ordem do terminal mudou...";
       }
+
       setMsg(
-        "❌ Código errado. A ordem mudou — tens de perceber os símbolos.",
+        "❌ Código errado. A ordem mudou — volta às paredes.",
         "#ff4444",
         1600,
-        "Procura inscrições UV e abre o terminal."
+        "Aponta às paredes com UV e abre o terminal."
       );
       return false;
     }
 
-    // sucesso
     solved = true;
     playSfx("sfx-door-open", 0.75);
 
@@ -223,12 +354,12 @@ window.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
-  if (btnConfirm)
+  if (btnConfirm) {
     btnConfirm.addEventListener("click", () => {
       const ok = validateCode();
       if (ok) setTimeout(closeCodeOverlay, 650);
     });
-
+  }
   if (btnClose) btnClose.addEventListener("click", closeCodeOverlay);
 
   if (overlay) {
@@ -237,20 +368,35 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  ["code-slot-0", "code-slot-1", "code-slot-2", "code-slot-3"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        const ok = validateCode();
-        if (ok) setTimeout(closeCodeOverlay, 650);
-      }
-    });
-  });
+  // UX: 1 dígito -> avança para o próximo (bom em mobile)
+  ["term-slot-0", "term-slot-1", "term-slot-2", "term-slot-3"].forEach(
+    (id, idx) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      el.addEventListener("input", () => {
+        el.value = (el.value || "").replace(/\D/g, "").slice(0, 1);
+        if (el.value && idx < 3) {
+          document.getElementById(`term-slot-${idx + 1}`)?.focus();
+        }
+      });
+
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const ok = validateCode();
+          if (ok) setTimeout(closeCodeOverlay, 650);
+        }
+        // backspace vazio -> volta atrás
+        if (e.key === "Backspace" && !el.value && idx > 0) {
+          document.getElementById(`term-slot-${idx - 1}`)?.focus();
+        }
+      });
+    }
+  );
 
   // ===== Componentes A-Frame =====
 
-  // 1) Gaveta que revela a lanterna UV
+  // 1) Gaveta abre e mostra lanterna
   if (!AFRAME.components["drawer-open-level4"]) {
     AFRAME.registerComponent("drawer-open-level4", {
       init: function () {
@@ -292,50 +438,38 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 2) Apanhar lanterna UV (e permitir toggle)
+  // 2) Apanhar lanterna UV
   if (!AFRAME.components["uv-pickup-level4"]) {
     AFRAME.registerComponent("uv-pickup-level4", {
       init: function () {
         this.el.addEventListener("click", () => {
           if (hasUV) return;
-
           hasUV = true;
+
           this.el.setAttribute("visible", "false");
           playSfx("sfx-find-lighter", 0.8);
 
           setMsg(
-            "✅ Apanhaste a lanterna UV! (Tecla F ou clica no pedestal para ligar)",
+            "✅ Apanhaste a lanterna UV! (U para ligar/desligar)",
             "#00ff00",
             2200,
-            "Liga a UV e procura inscrições."
+            "Liga a UV e passa o feixe nas marcas."
           );
         });
       },
     });
   }
 
-  // 3) Pedestal/interruptor para ligar/desligar UV
+  // 3) Pedestal alterna UV
   if (!AFRAME.components["uv-toggle-pedestal"]) {
     AFRAME.registerComponent("uv-toggle-pedestal", {
       init: function () {
-        this.el.addEventListener("click", () => {
-          if (!hasUV) {
-            playSfx("sfx-hmm-reflexion", 0.75);
-            setMsg(
-              "❌ Precisas da lanterna UV primeiro.",
-              "#ff4444",
-              1400,
-              "Procura a lanterna."
-            );
-            return;
-          }
-          toggleUV();
-        });
+        this.el.addEventListener("click", () => toggleUV());
       },
     });
   }
 
-  // 4) Terminal para abrir overlay
+  // 4) Terminal abre overlay
   if (!AFRAME.components["terminal-open-level4"]) {
     AFRAME.registerComponent("terminal-open-level4", {
       init: function () {
@@ -378,7 +512,6 @@ window.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
-          // abre porta (visual)
           const pivot = document.getElementById("doorPivot");
           if (pivot) {
             pivot.setAttribute("animation__open", {
@@ -389,7 +522,6 @@ window.addEventListener("DOMContentLoaded", () => {
             });
           }
 
-          // jumpscare + fim
           setTimeout(() => {
             if (jumpscare) {
               jumpscare.style.display = "flex";
@@ -413,22 +545,18 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== Bind a elementos =====
-  const drawer = document.getElementById("uv-drawer");
-  if (drawer) drawer.setAttribute("drawer-open-level4", "");
-
-  const uvFlash = document.getElementById("uv-flashlight");
-  if (uvFlash) uvFlash.setAttribute("uv-pickup-level4", "");
-
-  const uvPedestal = document.getElementById("uv-pedestal");
-  if (uvPedestal) uvPedestal.setAttribute("uv-toggle-pedestal", "");
-
-  const terminal = document.getElementById("terminal");
-  if (terminal) terminal.setAttribute("terminal-open-level4", "");
-
+  // ===== Bind =====
+  document.getElementById("uv-drawer")?.setAttribute("drawer-open-level4", "");
+  document
+    .getElementById("uv-flashlight")
+    ?.setAttribute("uv-pickup-level4", "");
+  document
+    .getElementById("uv-pedestal")
+    ?.setAttribute("uv-toggle-pedestal", "");
+  document.getElementById("terminal")?.setAttribute("terminal-open-level4", "");
   if (doorEl) doorEl.setAttribute("door-system-level4", "");
 
-  // estado inicial de luz
-  applyUV();
+  // estado inicial
+  applyUVVisuals();
   setMsg("Encontra a lanterna UV. Esta sala não perdoa.", "white");
 });

@@ -19,54 +19,83 @@
         inset: 0;
         display: none;
         z-index: 2500;
-        background: rgba(0, 0, 0, 0.65);
+        background: rgba(0, 0, 0, 0.7);
         align-items: center;
         justify-content: center;
-      }
-      #code-overlay .panel {
-        width: min(560px, calc(100vw - 36px));
-        background: rgba(0, 0, 0, 0.95);
-        border: 2px solid rgba(180, 100, 255, 0.45);
-        border-radius: 14px;
         padding: 18px;
+      }
+
+      #code-overlay .panel {
+        width: min(720px, calc(100vw - 36px));
+        background: rgba(0, 0, 0, 0.95);
+        border: 2px solid rgba(180, 100, 255, 0.5);
+        border-radius: 18px;
+        padding: 22px 22px 18px;
         color: #e8e8e8;
+        box-shadow: 0 0 50px rgba(180, 100, 255, 0.15);
       }
-      #code-overlay .row {
+
+      #code-overlay .code-grid {
+        margin-top: 18px;
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-        margin-top: 12px;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 18px;
       }
+
+      #code-overlay .code-slot {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        align-items: center;
+        gap: 12px;
+      }
+
+      #code-overlay label {
+        font-weight: 900;
+        letter-spacing: 1px;
+        color: #ffffff;
+        opacity: 0.95;
+      }
+
       #code-overlay input {
-        font-size: 26px;
-        padding: 10px 12px;
+        font-size: 28px;
+        padding: 12px 14px;
         text-align: center;
         border: 2px solid rgba(180, 100, 255, 0.45);
         background: #070707;
         color: #f0dcff;
-        border-radius: 12px;
+        border-radius: 14px;
         outline: none;
       }
+
       #code-overlay .actions {
         display: flex;
-        gap: 10px;
-        margin-top: 14px;
+        gap: 12px;
+        margin-top: 18px;
       }
+
       #code-overlay button {
         font-size: 16px;
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 12px 16px;
+        border-radius: 12px;
         border: none;
         cursor: pointer;
       }
+
       #code-confirm {
         background: #b86bff;
         color: #0b0014;
-        font-weight: 800;
+        font-weight: 900;
       }
+
       #code-close {
         background: #333;
         color: #fff;
+      }
+
+      @media (max-width: 560px) {
+        #code-overlay .code-grid {
+          grid-template-columns: 1fr;
+        }
       }
 
       /* Jumpscare */
@@ -138,7 +167,7 @@
     <div id="hud">
       <div>Final: <span style="color: #d39bff">UV</span> + Terminal</div>
       <div id="msg">Encontra a lanterna UV. Esta sala não perdoa.</div>
-      <div class="hud-hint">ESC pausa | F liga/desliga UV</div>
+      <div class="hud-hint">ESC pausa | U liga/desliga UV</div>
     </div>
 
     <div id="timer-top" class="timer-top" aria-label="Tempo restante">
@@ -252,12 +281,12 @@
 
     <a-scene fog="type: exponential; color: #050103; density: 0.04">
       <a-assets></a-assets>
-
       <a-sky color="#030001"></a-sky>
 
-      <!-- Chão -->
+      <!-- Chão (raycastável para UV) -->
       <a-plane
         id="floor"
+        class="uv-ray"
         position="0 0 0"
         rotation="-90 0 0"
         width="12"
@@ -266,33 +295,36 @@
         nav-mesh
       ></a-plane>
 
-      <!-- Paredes -->
+      <!-- Paredes (raycastáveis para UV) -->
       <a-box
-        class="wall"
+        class="wall uv-ray"
         position="0 2 -6"
         width="12"
         height="4"
         depth="0.2"
         material="shader: standard; color: #2b151a; roughness: 1"
       ></a-box>
+
       <a-box
-        class="wall"
+        class="wall uv-ray"
         position="-6 2 0"
         width="0.2"
         height="4"
         depth="12"
         material="shader: standard; color: #2b151a; roughness: 1"
       ></a-box>
+
       <a-box
-        class="wall"
+        class="wall uv-ray"
         position="6 2 0"
         width="0.2"
         height="4"
         depth="12"
         material="shader: standard; color: #2b151a; roughness: 1"
       ></a-box>
+
       <a-box
-        class="wall"
+        class="wall uv-ray"
         position="0 2 6"
         width="12"
         height="4"
@@ -300,9 +332,10 @@
         material="shader: standard; color: #2b151a; roughness: 1"
       ></a-box>
 
-      <!-- Teto -->
+      <!-- Teto (raycastável para UV) -->
       <a-plane
         id="ceiling"
+        class="uv-ray"
         position="0 4 0"
         rotation="90 0 0"
         width="12"
@@ -310,21 +343,13 @@
         material="shader: standard; color: #0f0a0b; roughness: 1"
       ></a-plane>
 
-      <!-- Luz normal + luz UV -->
+      <!-- Luz normal -->
       <a-light
         id="normal-light"
         type="point"
         position="0 3.3 1.2"
         intensity="0.55"
         color="#ffb3b3"
-        distance="18"
-      ></a-light>
-      <a-light
-        id="uv-light"
-        type="point"
-        position="0 3.3 1.2"
-        intensity="0.0"
-        color="#b86bff"
         distance="18"
       ></a-light>
       <a-light type="ambient" intensity="0.10" color="#1a0b0e"></a-light>
@@ -348,7 +373,6 @@
           material="shader: standard; color:#26130e; roughness:0.95"
         ></a-box>
 
-        <!-- lanterna UV (só aparece após abrir gaveta) -->
         <a-box
           id="uv-flashlight"
           class="interactable"
@@ -361,7 +385,7 @@
         ></a-box>
       </a-entity>
 
-      <!-- Pedestal para ligar/desligar UV -->
+      <!-- Pedestal -->
       <a-cylinder
         id="uv-pedestal"
         class="interactable"
@@ -378,45 +402,53 @@
         width="3"
       ></a-text>
 
-      <!-- Textos UV (invisíveis até UV ligada) -->
+      <!-- Textos UV (todos consistentes: class uv-clue, visible false, opacity 0) -->
       <a-text
         id="uv-TRI"
+        class="uv-clue"
         position="-5.6 2.8 0"
         rotation="0 90 0"
         value="TRI:?"
         color="#d39bff"
         width="6"
         visible="false"
+        material="transparent: true; opacity: 0"
       ></a-text>
 
       <a-text
         id="uv-CIR"
+        class="uv-clue"
         position="5.6 2.4 1.0"
         rotation="0 -90 0"
         value="CIR:?"
         color="#d39bff"
         width="6"
         visible="false"
+        material="transparent: true; opacity: 0"
       ></a-text>
 
       <a-text
         id="uv-SQR"
+        class="uv-clue"
         position="0 2.3 -5.6"
         rotation="0 0 0"
         value="SQR:?"
         color="#d39bff"
         width="6"
         visible="false"
+        material="transparent: true; opacity: 0"
       ></a-text>
 
       <a-text
         id="uv-X"
+        class="uv-clue"
         position="0 1.9 5.6"
         rotation="0 180 0"
         value="X:?"
         color="#d39bff"
         width="6"
         visible="false"
+        material="transparent: true; opacity: 0"
       ></a-text>
 
       <!-- Terminal -->
@@ -490,15 +522,29 @@
         movement-controls="speed: 0.32; fly: false; constrainToNavMesh: true"
       >
         <a-camera
+          id="player-camera"
           position="0 1.6 0"
           wasd-controls="enabled: false"
           look-controls="pointerLockEnabled: false"
         >
+          <!-- UV spotlight (mais forte e com alcance) -->
+          <a-light
+            id="uv-spot"
+            type="spot"
+            color="#b86bff"
+            intensity="0"
+            angle="12"
+            penumbra="0.25"
+            distance="10"
+            decay="0.6"
+            position="0 0 -0.05"
+          ></a-light>
+
           <a-cursor
             color="#ff0000"
             fuse="true"
             fuse-timeout="800"
-            raycaster="objects: .interactable"
+            raycaster="objects: .interactable, .uv-ray; far: 6 "
           ></a-cursor>
         </a-camera>
       </a-entity>
@@ -532,6 +578,6 @@
     </audio>
 
     <!-- Script do nível -->
-    <script src="../assets/scripts/levels/level4.js?v=1"></script>
+    <script src="../assets/scripts/levels/level4.js?v=2"></script>
   </body>
 </html>
