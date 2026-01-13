@@ -110,6 +110,17 @@
           <span class="level-title">NÍVEL 3 - Sala Final</span><br />
           <small class="level-sub">Descubra o código secreto</small>
         </a>
+
+        <a
+          id="btn-level-4"
+          href="pages/nivel4-simples.html"
+          class="level-btn"
+          data-level="4"
+        >
+          <span class="lock-badge" aria-hidden="true">🔒</span>
+          <span class="level-title">NÍVEL 4 - Final (UV)</span><br />
+          <small class="level-sub">UV + Terminal (Boss)</small>
+        </a>
       </div>
 
       <!-- Aviso (toast) quando clicas em nível bloqueado -->
@@ -194,14 +205,18 @@
       function syncLevelButtons() {
         const btn2 = document.getElementById("btn-level-2");
         const btn3 = document.getElementById("btn-level-3");
+        const btn4 = document.getElementById("btn-level-4");
 
         const unlocked2 =
           typeof isUnlockedLevel === "function" ? isUnlockedLevel(2) : false;
         const unlocked3 =
           typeof isUnlockedLevel === "function" ? isUnlockedLevel(3) : false;
+        const unlocked4 =
+          typeof isUnlockedLevel === "function" ? isUnlockedLevel(4) : false;
 
         setButtonLocked(btn2, !unlocked2);
         setButtonLocked(btn3, !unlocked3);
+        setButtonLocked(btn4, !unlocked4);
       }
 
       window.addEventListener("DOMContentLoaded", () => {

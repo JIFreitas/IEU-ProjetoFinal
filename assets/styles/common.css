@@ -361,3 +361,109 @@ input[type="range"] {
   color: #ff0000 !important;
   text-shadow: 0 0 16px rgba(255, 0, 0, 0.95), 0 0 14px rgba(0, 0, 0, 0.95) !important;
 }
+
+/* ========= TERMINAL FINAL (NÍVEL 4) ========= */
+/* COLA AQUI O CSS DO TERMINAL FINAL */
+
+/* ✅ Impede “fugas” de largura em inputs + padding/border */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+#terminal-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 2500;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  padding: 18px; /* ✅ dá margem no mobile */
+}
+
+#terminal-overlay .panel {
+  width: min(720px, calc(100vw - 36px));
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid rgba(160, 90, 255, 0.45); /* tom roxo */
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  color: #e8e8e8;
+  overflow: hidden; /* ✅ corta qualquer coisa que tente sair */
+}
+
+/* ✅ Grid dos 4 dígitos */
+.code-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  align-items: end;
+}
+
+/* ✅ Cada slot: label em cima e input centrado */
+.code-slot label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  margin: 0 0 6px;
+}
+
+.code-slot input {
+  width: 100%;
+  min-width: 0;              /* ✅ MUITO IMPORTANTE em grid/flex */
+  font-size: 28px;
+  text-align: center;
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 2px solid rgba(160, 90, 255, 0.55);
+  background: #080808;
+  color: #f2e9ff;
+  outline: none;
+}
+
+.code-slot input:focus {
+  border-color: rgba(200, 140, 255, 0.9);
+}
+
+/* ✅ Botões */
+#terminal-overlay .actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap; /* ✅ no mobile não rebenta */
+}
+
+#terminal-overlay button {
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+#terminal-confirm {
+  background: #a05aff; /* roxo */
+  color: #0b0014;
+  font-weight: 700;
+}
+
+#terminal-close {
+  background: #333;
+  color: #fff;
+}
+
+/* ✅ Responsivo: 2 colunas no telemóvel */
+@media (max-width: 560px) {
+  .code-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .code-grid {
+    grid-template-columns: 1fr;
+  }
+}

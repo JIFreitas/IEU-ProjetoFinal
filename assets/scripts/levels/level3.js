@@ -88,16 +88,19 @@ window.addEventListener("DOMContentLoaded", () => {
       if (hex) el.setAttribute("material", `color: ${hex}`);
     });
 
-    document.querySelectorAll('#terminal-overlay .swatch[data-slot]').forEach((el) => {
-      const slot = parseInt(el.getAttribute("data-slot"), 10);
-      const colorKey = terminalOrder[slot];
-      const hex = COLOR_META[colorKey]?.hex;
-      if (hex) el.style.background = hex;
-    });
+    document
+      .querySelectorAll("#terminal-overlay .swatch[data-slot]")
+      .forEach((el) => {
+        const slot = parseInt(el.getAttribute("data-slot"), 10);
+        const colorKey = terminalOrder[slot];
+        const hex = COLOR_META[colorKey]?.hex;
+        if (hex) el.style.background = hex;
+      });
 
     if (terminalOrderText) {
       terminalOrderText.textContent =
-        "Ordem atual: " + terminalOrder.map((c) => COLOR_META[c]?.name || c).join(" → ");
+        "Ordem atual: " +
+        terminalOrder.map((c) => COLOR_META[c]?.name || c).join(" → ");
     }
   }
 
@@ -106,7 +109,12 @@ window.addEventListener("DOMContentLoaded", () => {
     terminalOverlay.style.display = "flex";
     terminalOverlay.setAttribute("aria-hidden", "false");
     if (terminalMsg) terminalMsg.textContent = "";
-    setMsg("⌨️ Insere as contagens por cor.", "#00ff00", 1200, "Conta os objetos por cor e insere no terminal (esq → dir)." );
+    setMsg(
+      "⌨️ Insere as contagens por cor.",
+      "#00ff00",
+      1200,
+      "Conta os objetos por cor e insere no terminal (esq → dir)."
+    );
     const first = document.getElementById("term-slot-0");
     if (first) first.focus();
   }
@@ -161,14 +169,23 @@ window.addEventListener("DOMContentLoaded", () => {
       if (terminalMsg) terminalMsg.style.color = "#ff4444";
       if (terminalMsg)
         terminalMsg.textContent = "✗ Errado. Volta a contar com calma.";
-      setMsg("❌ Código errado. Tenta novamente.", "#ff4444", 1200, "Conta os objetos por cor e insere no terminal (esq → dir)." );
+      setMsg(
+        "❌ Código errado. Tenta novamente.",
+        "#ff4444",
+        1200,
+        "Conta os objetos por cor e insere no terminal (esq → dir)."
+      );
       return false;
     }
 
     // sucesso
     solved = true;
+
+    unlockLevel(4);
+
     if (terminalMsg) terminalMsg.style.color = "#00ff00";
-    if (terminalMsg) terminalMsg.textContent = "✓ Acesso concedido! Porta destrancada.";
+    if (terminalMsg)
+      terminalMsg.textContent = "✓ Acesso concedido! Porta destrancada.";
     if (terminalStateSpan) terminalStateSpan.textContent = "DESTRANCADO";
     if (terminalStatusText) {
       terminalStatusText.setAttribute("value", "TERMINAL\n[OK]");
@@ -235,7 +252,7 @@ window.addEventListener("DOMContentLoaded", () => {
       ctx.fillStyle = `rgba(0,0,0,${0.08 + rand(p * 2.1) * 0.06})`;
       ctx.fillRect(x0, 0, 2, h);
       for (let y = 0; y < h; y++) {
-        const wobble = (Math.sin((y * 0.06) + p) + Math.sin(y * 0.013)) * 0.5;
+        const wobble = (Math.sin(y * 0.06 + p) + Math.sin(y * 0.013)) * 0.5;
         ctx.fillStyle = `rgba(0,0,0,${0.02 + Math.max(0, wobble) * 0.02})`;
         ctx.fillRect(x0, y, plankW, 1);
       }
@@ -324,7 +341,12 @@ window.addEventListener("DOMContentLoaded", () => {
           if (!solved) {
             playSfx("sfx-door-locked", 0.75);
             showDoorLockedText();
-            setMsg("❌ Porta trancada. Resolve o terminal.", "#ff4444", 1400, "Conta os objetos por cor e insere no terminal (esq → dir)." );
+            setMsg(
+              "❌ Porta trancada. Resolve o terminal.",
+              "#ff4444",
+              1400,
+              "Conta os objetos por cor e insere no terminal (esq → dir)."
+            );
             return;
           }
 
@@ -342,9 +364,8 @@ window.addEventListener("DOMContentLoaded", () => {
           setMsg("✅ ESCAPASTE!", "#00ff00");
           setTimeout(() => {
             stopLevelTimer();
-            alert("🎉 VOCÊ COMPLETOU TODOS OS NÍVEIS! 🎉");
-            resetProgress();
-            window.location.href = "../index-simples.html";
+            setUnlockedLevel(4);
+            window.location.href = "nivel4-simples.html";
           }, 1600);
         });
       },
@@ -391,7 +412,8 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   if (terminalStateSpan) terminalStateSpan.textContent = "TRANCADO";
-  if (terminalStatusText) terminalStatusText.setAttribute("value", "TERMINAL\n[CLIQUE]");
+  if (terminalStatusText)
+    terminalStatusText.setAttribute("value", "TERMINAL\n[CLIQUE]");
   setMsg("Conta os objetos por cor e insere no terminal (esq → dir).", "white");
 
   initTerminalOrder();
