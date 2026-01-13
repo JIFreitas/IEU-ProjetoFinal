@@ -15,6 +15,11 @@
   </head>
 
   <body>
+    <div id="intro-overlay" class="wait" aria-label="Introdução">
+      <div class="intro-text">Onde é que eu estou?</div>
+      <div class="intro-hint">Clique para acordar</div>
+    </div>
+
     <div id="hud">
       <div>Chaves: <span id="keys">0</span>/3</div>
       <div id="msg">Encontra 3 chaves para abrir a porta!</div>
@@ -61,16 +66,20 @@
       </button>
     </div>
 
-    <a-scene fog="type: exponential; color: #0a0502; density: 0.03">
+    <a-scene fog="type: exponential; color: #1b120c; density: 0.02">
       <a-assets>
-        <!-- Futuro: texturas / modelos -->
-        <!-- <img id="woodTexture" src="../assets/textures/wood_dark.jpg" /> -->
+        <!-- Texturas procedurais (canvas) - geradas no level1.js -->
+        <canvas id="tex-floor" width="256" height="256"></canvas>
+        <canvas id="tex-wall" width="256" height="256"></canvas>
+        <canvas id="tex-wood" width="256" height="256"></canvas>
+        <canvas id="tex-ceiling" width="256" height="256"></canvas>
       </a-assets>
 
-      <a-sky color="#111"></a-sky>
+      <a-sky color="#1c1410"></a-sky>
 
       <!-- Chão com nav-mesh -->
       <a-plane
+        id="floor"
         position="0 0 0"
         rotation="-90 0 0"
         width="13.7"
@@ -79,8 +88,18 @@
         nav-mesh
       ></a-plane>
 
+      <!-- Tapete (disfarça zonas "importantes") -->
+      <a-plane
+        position="0 0.01 -0.5"
+        rotation="-90 0 0"
+        width="6.2"
+        height="4.6"
+        material="color: #3b1f16; opacity: 0.95; roughness: 1; metalness: 0"
+      ></a-plane>
+
       <!-- Paredes -->
       <a-box
+        class="wall"
         position="0 2 -7"
         width="15"
         height="4"
@@ -88,6 +107,7 @@
         color="#4a3020"
       ></a-box>
       <a-box
+        class="wall"
         position="-7 2 0"
         width="0.2"
         height="4"
@@ -95,6 +115,7 @@
         color="#4a3020"
       ></a-box>
       <a-box
+        class="wall"
         position="7 2 0"
         width="0.2"
         height="4"
@@ -102,6 +123,7 @@
         color="#4a3020"
       ></a-box>
       <a-box
+        class="wall"
         position="0 2 7"
         width="15"
         height="4"
@@ -111,6 +133,7 @@
 
       <!-- Teto -->
       <a-plane
+        id="ceiling"
         position="0 4 0"
         rotation="90 0 0"
         width="15"
@@ -122,47 +145,174 @@
       <a-entity
         id="key1"
         class="key"
-        position="-3 0.75 -2.35"
+        position="3.9 0.75 2.45"
         visible="false"
-        geometry="primitive: cylinder; radius: 0.05; height: 0.35"
-        material="color: #d4af37; metalness: 0.8; roughness: 0.2"
-        rotation="0 0 90"
-      ></a-entity>
+        rotation="0 25 0"
+        geometry="primitive: box; width: 0.55; height: 0.25; depth: 0.55"
+        material="opacity: 0; transparent: true"
+      >
+        <!-- argola -->
+        <a-entity
+          position="-0.18 0 0"
+          geometry="primitive: torus; radius: 0.12; radiusTubular: 0.03"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.25"
+          rotation="90 0 0"
+        ></a-entity>
+        <!-- corpo -->
+        <a-entity
+          position="0.06 0 0"
+          geometry="primitive: cylinder; radius: 0.035; height: 0.38"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.25"
+          rotation="0 0 90"
+        ></a-entity>
+        <!-- dentes -->
+        <a-entity
+          position="0.23 0.01 0"
+          geometry="primitive: box; width: 0.12; height: 0.05; depth: 0.06"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.28"
+        ></a-entity>
+        <a-entity
+          position="0.19 -0.045 0"
+          geometry="primitive: box; width: 0.08; height: 0.05; depth: 0.06"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.28"
+        ></a-entity>
+      </a-entity>
 
       <a-entity
         id="key2"
         class="key"
-        position="2 1.05 -2.9"
+        position="-2.5 1.05 0.9"
         visible="false"
-        geometry="primitive: cylinder; radius: 0.05; height: 0.35"
-        material="color: #d4af37; metalness: 0.8; roughness: 0.2"
-        rotation="0 0 90"
-      ></a-entity>
+        rotation="0 -35 0"
+        geometry="primitive: box; width: 0.55; height: 0.25; depth: 0.55"
+        material="opacity: 0; transparent: true"
+      >
+        <a-entity
+          position="-0.18 0 0"
+          geometry="primitive: torus; radius: 0.12; radiusTubular: 0.03"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.25"
+          rotation="90 0 0"
+        ></a-entity>
+        <a-entity
+          position="0.06 0 0"
+          geometry="primitive: cylinder; radius: 0.035; height: 0.38"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.25"
+          rotation="0 0 90"
+        ></a-entity>
+        <a-entity
+          position="0.23 0.01 0"
+          geometry="primitive: box; width: 0.12; height: 0.05; depth: 0.06"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.28"
+        ></a-entity>
+        <a-entity
+          position="0.19 -0.045 0"
+          geometry="primitive: box; width: 0.08; height: 0.05; depth: 0.06"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.28"
+        ></a-entity>
+      </a-entity>
 
       <a-entity
         id="key3"
         class="key"
-        position="0 1.55 -5.6"
+        position="4.2 1.55 -6.2"
         visible="false"
-        geometry="primitive: cylinder; radius: 0.05; height: 0.35"
-        material="color: #d4af37; metalness: 0.8; roughness: 0.2"
-        rotation="0 0 90"
-      ></a-entity>
+        rotation="0 120 0"
+        geometry="primitive: box; width: 0.55; height: 0.25; depth: 0.55"
+        material="opacity: 0; transparent: true"
+      >
+        <a-entity
+          position="-0.18 0 0"
+          geometry="primitive: torus; radius: 0.12; radiusTubular: 0.03"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.25"
+          rotation="90 0 0"
+        ></a-entity>
+        <a-entity
+          position="0.06 0 0"
+          geometry="primitive: cylinder; radius: 0.035; height: 0.38"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.25"
+          rotation="0 0 90"
+        ></a-entity>
+        <a-entity
+          position="0.23 0.01 0"
+          geometry="primitive: box; width: 0.12; height: 0.05; depth: 0.06"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.28"
+        ></a-entity>
+        <a-entity
+          position="0.19 -0.045 0"
+          geometry="primitive: box; width: 0.08; height: 0.05; depth: 0.06"
+          material="shader: standard; color: #d4af37; metalness: 0.9; roughness: 0.28"
+        ></a-entity>
+      </a-entity>
 
       <!-- ===== ESCONDERIJO 1: CÓMODA + GAVETA ===== -->
       <a-box
         id="dresser"
-        position="-3 0.6 -3"
+        position="3.9 0.6 1.8"
         width="1.6"
         height="1.2"
         depth="0.6"
         color="#3b2a1a"
       ></a-box>
 
+      <!-- Coisas em cima da cómoda -->
+      <a-entity position="3.9 1.22 1.8">
+        <a-box position="-0.45 0.05 0.05" width="0.42" height="0.06" depth="0.26" rotation="0 14 0" material="color: #2d2d2d; roughness: 0.98"></a-box>
+        <a-box position="-0.45 0.11 0.05" width="0.38" height="0.05" depth="0.22" rotation="0 14 0" material="color: #6b2a2a; roughness: 0.95"></a-box>
+        <a-box position="0.2 0.06 -0.08" width="0.28" height="0.08" depth="0.2" rotation="0 -8 0" material="color: #3b3b3b; roughness: 0.98"></a-box>
+        <a-cylinder position="0.5 0.06 0.12" radius="0.06" height="0.1" material="color: #2a201b; roughness: 1"></a-cylinder>
+        <a-sphere position="0.5 0.14 0.12" radius="0.1" material="color: #2f5a2f; roughness: 1"></a-sphere>
+      </a-entity>
+
+      <!-- Móveis extra para camuflar a cómoda verdadeira -->
+      <a-box
+        position="-6.3 0.55 1.9"
+        width="1.5"
+        height="1.1"
+        depth="0.6"
+        material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.9; metalness: 0.03; color: #5b331a"
+      ></a-box>
+      <a-box
+        position="-6.3 1.25 1.9"
+        width="1.55"
+        height="0.25"
+        depth="0.65"
+        material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.92; metalness: 0.02; color: #4b2b15"
+      ></a-box>
+
+      <!-- Coisas em cima da mesinha (z=1.9) -->
+      <a-entity position="-6.3 1.38 1.9">
+        <a-box position="-0.35 0.06 0.05" width="0.34" height="0.08" depth="0.22" rotation="0 22 0" material="color: #3b3b3b; roughness: 0.98"></a-box>
+        <a-box position="0.18 0.05 -0.1" width="0.25" height="0.06" depth="0.18" rotation="0 -12 0" material="color: #2a4a6b; roughness: 0.95"></a-box>
+        <a-box position="0.36 0.12 -0.1" width="0.06" height="0.22" depth="0.16" rotation="0 -12 0" material="color: #4a6b2a; roughness: 0.95"></a-box>
+        <a-cylinder position="0.52 0.05 0.12" radius="0.05" height="0.08" material="color: #2a201b; roughness: 1"></a-cylinder>
+      </a-entity>
+
+      <a-box
+        position="-6.3 0.55 0.4"
+        width="1.5"
+        height="1.1"
+        depth="0.6"
+        material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.9; metalness: 0.03; color: #5b331a"
+      ></a-box>
+      <a-box
+        position="-6.3 1.25 0.4"
+        width="1.55"
+        height="0.25"
+        depth="0.65"
+        material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.92; metalness: 0.02; color: #4b2b15"
+      ></a-box>
+
+      <!-- Coisas em cima da mesinha (z=0.4) -->
+      <a-entity position="-6.3 1.38 0.4">
+        <a-box position="-0.4 0.06 -0.02" width="0.36" height="0.07" depth="0.24" rotation="0 -18 0" material="color: #6b5a2a; roughness: 0.95"></a-box>
+        <a-box position="-0.05 0.05 0.12" width="0.22" height="0.06" depth="0.16" rotation="0 10 0" material="color: #5a2a6b; roughness: 0.95"></a-box>
+        <a-box position="0.25 0.05 -0.08" width="0.2" height="0.08" depth="0.18" rotation="0 6 0" material="color: #2d2d2d; roughness: 0.98"></a-box>
+      </a-entity>
+
       <a-box
         id="drawer1"
         class="drawer"
-        position="-3 0.55 -2.72"
+        position="3.9 0.55 2.08"
         width="1.3"
         height="0.35"
         depth="0.18"
@@ -171,36 +321,57 @@
 
       <!-- ===== ESCONDERIJO 2: MESA + CAIXA ===== -->
       <a-box
-        position="2 0.45 -3"
+        position="-2.5 0.45 0.8"
         width="1.8"
         height="0.1"
         depth="1.2"
         color="#2f241b"
       ></a-box>
 
+      <!-- Clutter na mesa (para a caixa não ser óbvia) -->
+      <a-cylinder
+        position="-3.1 0.62 0.55"
+        radius="0.06"
+        height="0.22"
+        material="shader: standard; color: #2b2b2b; roughness: 0.9; metalness: 0.1"
+      ></a-cylinder>
+      <a-cylinder
+        position="-1.95 0.62 1.18"
+        radius="0.05"
+        height="0.18"
+        material="shader: standard; color: #3b3b3b; roughness: 0.95; metalness: 0.05"
+      ></a-cylinder>
+      <a-plane
+        position="-3.05 0.505 1.12"
+        rotation="-90 -12 0"
+        width="0.5"
+        height="0.32"
+        material="color: #cbbba6; opacity: 0.9; roughness: 1; metalness: 0"
+      ></a-plane>
+
       <a-box
-        position="1.3 0.2 -2.5"
+        position="-3.2 0.2 1.3"
         width="0.1"
         height="0.4"
         depth="0.1"
         color="#2f241b"
       ></a-box>
       <a-box
-        position="2.7 0.2 -2.5"
+        position="-1.8 0.2 1.3"
         width="0.1"
         height="0.4"
         depth="0.1"
         color="#2f241b"
       ></a-box>
       <a-box
-        position="1.3 0.2 -3.5"
+        position="-3.2 0.2 0.3"
         width="0.1"
         height="0.4"
         depth="0.1"
         color="#2f241b"
       ></a-box>
       <a-box
-        position="2.7 0.2 -3.5"
+        position="-1.8 0.2 0.3"
         width="0.1"
         height="0.4"
         depth="0.1"
@@ -209,7 +380,7 @@
 
       <a-box
         id="boxBase"
-        position="2 0.65 -3"
+        position="-2.5 0.65 0.8"
         width="0.6"
         height="0.25"
         depth="0.6"
@@ -219,59 +390,222 @@
       <a-box
         id="boxLid"
         class="boxlid"
-        position="2 0.8 -3"
+        position="-2.5 0.8 0.8"
         width="0.62"
         height="0.05"
         depth="0.62"
         color="#333333"
       ></a-box>
 
+      <!-- Caixas extra no chão (distrai e dá contexto) -->
+      <a-box
+        position="3.9 0.25 -4.8"
+        width="0.7"
+        height="0.5"
+        depth="0.7"
+        material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.95; metalness: 0.02; color: #4a2c16"
+      ></a-box>
+      <a-box
+        position="3.35 0.18 -4.15"
+        width="0.55"
+        height="0.35"
+        depth="0.55"
+        material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.95; metalness: 0.02; color: #4a2c16"
+      ></a-box>
+
       <!-- ===== ESCONDERIJO 3: QUADRO ===== -->
+      <!-- Quadros decorativos (para o quadro verdadeiro não saltar à vista) -->
+      <a-box
+        position="-3.2 2.1 -6.84"
+        width="1.15"
+        height="0.75"
+        depth="0.03"
+        rotation="0 0 0"
+        material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"
+      ></a-box>
+      <a-box
+        position="1.9 1.7 -6.84"
+        width="1.0"
+        height="0.65"
+        depth="0.03"
+        rotation="0 0 0"
+        material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"
+      ></a-box>
+
       <a-box
         id="picture1"
         class="picture"
-        position="0 2 -6.85"
+        position="4.6 2 -6.85"
         width="1.4"
         height="0.9"
         depth="0.05"
         color="#111111"
+        rotation="0 0 0"
       ></a-box>
 
       <a-box
-        position="0 2 -6.84"
+        id="pictureFrame1"
+        position="4.6 2 -6.84"
         width="1.5"
         height="1.0"
         depth="0.03"
         color="#5a3b22"
+        rotation="0 0 0"
       ></a-box>
 
-      <!-- ===== Porta ===== -->
-      <a-box
-        id="door"
-        position="0 2 -6.9"
-        width="2"
-        height="3"
-        depth="0.1"
-        color="#663300"
-      ></a-box>
+      <!-- Estante + livros (enche a parede esquerda) -->
+      <a-entity position="-6.72 0 -2" rotation="0 90 0">
+        <a-box
+          position="0 1 0"
+          width="1.8"
+          height="2.0"
+          depth="0.35"
+          material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"
+        ></a-box>
+        <a-box position="0 0.35 0" width="1.7" height="0.06" depth="0.33" material="color: #2b1a10; roughness: 1"></a-box>
+        <a-box position="0 0.9 0" width="1.7" height="0.06" depth="0.33" material="color: #2b1a10; roughness: 1"></a-box>
+        <a-box position="0 1.45 0" width="1.7" height="0.06" depth="0.33" material="color: #2b1a10; roughness: 1"></a-box>
+
+        <!-- livros (simples) -->
+        <a-box position="-0.55 0.55 0.06" width="0.22" height="0.35" depth="0.08" material="color: #6b2a2a; roughness: 0.95"></a-box>
+        <a-box position="-0.28 0.55 0.06" width="0.18" height="0.28" depth="0.08" material="color: #2a4a6b; roughness: 0.95"></a-box>
+        <a-box position="-0.05 0.55 0.06" width="0.2" height="0.32" depth="0.08" material="color: #4a6b2a; roughness: 0.95"></a-box>
+        <a-box position="0.22 0.55 0.06" width="0.18" height="0.3" depth="0.08" material="color: #6b5a2a; roughness: 0.95"></a-box>
+        <a-box position="0.48 0.55 0.06" width="0.22" height="0.34" depth="0.08" material="color: #5a2a6b; roughness: 0.95"></a-box>
+
+        <a-box position="-0.45 1.1 0.06" width="0.2" height="0.3" depth="0.08" material="color: #3a3a3a; roughness: 0.98"></a-box>
+        <a-box position="-0.2 1.1 0.06" width="0.22" height="0.36" depth="0.08" material="color: #2a6b5a; roughness: 0.95"></a-box>
+        <a-box position="0.08 1.1 0.06" width="0.18" height="0.28" depth="0.08" material="color: #6b2a4a; roughness: 0.95"></a-box>
+        <a-box position="0.34 1.1 0.06" width="0.2" height="0.32" depth="0.08" material="color: #4a2a2a; roughness: 0.98"></a-box>
+
+        <!-- coisas em cima (para não parecer vazia) -->
+        <a-box position="-0.55 2.05 0.05" width="0.55" height="0.07" depth="0.26" rotation="0 18 0" material="color: #2d2d2d; roughness: 0.95"></a-box>
+        <a-box position="-0.55 2.12 0.05" width="0.5" height="0.06" depth="0.22" rotation="0 18 0" material="color: #6b2a2a; roughness: 0.95"></a-box>
+
+        <a-box position="0.05 2.07 0.06" width="0.32" height="0.09" depth="0.22" rotation="0 -10 0" material="color: #3b3b3b; roughness: 0.98"></a-box>
+        <a-box position="0.32 2.12 0.06" width="0.08" height="0.28" depth="0.18" rotation="0 -10 0" material="color: #2a4a6b; roughness: 0.95"></a-box>
+        <a-box position="0.42 2.12 0.06" width="0.08" height="0.24" depth="0.18" rotation="0 -10 0" material="color: #4a6b2a; roughness: 0.95"></a-box>
+
+        <a-cylinder position="0.62 2.06 0.06" radius="0.07" height="0.1" material="color: #2a201b; roughness: 1"></a-cylinder>
+        <a-sphere position="0.62 2.14 0.06" radius="0.11" material="color: #2f5a2f; roughness: 1"></a-sphere>
+      </a-entity>
+
+      <!-- Banco (canto frontal) -->
+      <a-entity position="-3.8 0 6.2">
+        <a-box position="0 0.35 0" width="1.9" height="0.12" depth="0.55" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-box>
+        <a-box position="-0.85 0.17 -0.2" width="0.12" height="0.35" depth="0.12" material="color: #2b1a10; roughness: 1"></a-box>
+        <a-box position="0.85 0.17 -0.2" width="0.12" height="0.35" depth="0.12" material="color: #2b1a10; roughness: 1"></a-box>
+        <a-box position="-0.85 0.17 0.2" width="0.12" height="0.35" depth="0.12" material="color: #2b1a10; roughness: 1"></a-box>
+        <a-box position="0.85 0.17 0.2" width="0.12" height="0.35" depth="0.12" material="color: #2b1a10; roughness: 1"></a-box>
+      </a-entity>
+
+      <!-- Plantinha baixa (só para preencher) -->
+      <a-entity position="5.9 0 -5.8">
+        <a-cylinder radius="0.22" height="0.18" material="color: #2a201b; roughness: 1"></a-cylinder>
+        <a-sphere position="0 0.25 0" radius="0.28" material="color: #2f5a2f; roughness: 1"></a-sphere>
+      </a-entity>
+
+      <!-- ===== Porta (moldura fixa + folha com dobradiça) ===== -->
+      <a-entity id="doorframe" position="0 1.5 -6.9">
+        <a-box
+          position="0 0 0.06"
+          width="2.18"
+          height="3.18"
+          depth="0.08"
+          material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.8; metalness: 0.02; color: #5b331a"
+        ></a-box>
+      </a-entity>
+
+      <!-- Folha da porta: pivô no lado esquerdo; o elemento clicável é o #door -->
+      <a-entity id="doorPivot" position="-1 1.5 -6.9">
+        <!-- hitbox invisível centrada na folha (para click/raycaster) -->
+        <a-box
+          id="door"
+          class="door-hitbox"
+          position="1 0 0"
+          width="2"
+          height="3"
+          depth="0.22"
+          material="opacity: 0; transparent: true"
+        ></a-box>
+
+        <!-- folha (centrada em x=1 porque o pivô está na dobradiça) -->
+        <a-box
+          position="1 0 0.1"
+          width="1.92"
+          height="2.92"
+          depth="0.1"
+          material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.85; metalness: 0.02; color: #6a3a1d"
+        ></a-box>
+
+        <!-- painéis (relevo) -->
+        <a-box
+          position="1 0.45 0.16"
+          width="1.55"
+          height="1.1"
+          depth="0.04"
+          material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.9; metalness: 0.02; color: #7a4321"
+        ></a-box>
+        <a-box
+          position="1 -0.75 0.16"
+          width="1.55"
+          height="0.95"
+          depth="0.04"
+          material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.9; metalness: 0.02; color: #7a4321"
+        ></a-box>
+
+        <!-- maçaneta (lado direito) -->
+        <a-sphere
+          position="1.7 -0.05 0.2"
+          radius="0.06"
+          material="shader: standard; color: #c7a24a; metalness: 1; roughness: 0.25; emissive: #3a2a08; emissiveIntensity: 0.15"
+        ></a-sphere>
+        <a-cylinder
+          position="1.82 -0.05 0.2"
+          radius="0.025"
+          height="0.18"
+          rotation="0 0 90"
+          material="shader: standard; color: #c7a24a; metalness: 1; roughness: 0.28"
+        ></a-cylinder>
+      </a-entity>
 
       <a-text
         id="door-text"
         value="PORTA TRANCADA"
-        position="0 3.5 -6.8"
+        position="0 3.25 -6.8"
         align="center"
-        color="#ff0000"
+        color="#ffcc88"
         width="5"
+        visible="false"
       ></a-text>
 
-      <!-- ===== Luz (mais realista) ===== -->
-      <a-light type="ambient" intensity="0.15"></a-light>
+      <!-- placa (para o texto ficar legível) -->
+      <a-plane
+        id="door-text-bg"
+        position="0 3.25 -6.81"
+        width="3.8"
+        height="0.7"
+        material="color: #000; opacity: 0.35; transparent: true"
+        visible="false"
+      ></a-plane>
+
+      <!-- ===== Luz (mais clara + aconchegante) ===== -->
+      <a-light type="ambient" intensity="0.35" color="#ffd6b3"></a-light>
+
+      <a-light
+        type="directional"
+        position="-2 3.8 2"
+        rotation="-55 -20 0"
+        intensity="0.35"
+        color="#ffe6d6"
+      ></a-light>
+
       <a-light
         type="point"
-        position="0 3 0"
-        intensity="0.9"
-        color="#ffbb88"
-        distance="12"
+        position="0 3.2 0"
+        intensity="1.35"
+        color="#ffcc99"
+        distance="16"
       ></a-light>
 
       <!-- ===== Rig ===== -->
@@ -282,9 +616,11 @@
         movement-controls="speed: 0.3; fly: false; constrainToNavMesh: true"
       >
         <a-camera
+          id="player-camera"
           position="0 1.6 0"
+          rotation="-60 0 0"
           wasd-controls="enabled: false"
-          look-controls="pointerLockEnabled: false"
+          look-controls="enabled: false; pointerLockEnabled: false"
         >
           <a-cursor
             color="#ff0000"
@@ -298,6 +634,28 @@
 
     <audio id="bg-music" loop preload="auto">
       <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfx-door-open" preload="auto">
+      <source src="../assets/sounds/door-opening.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-door-locked" preload="auto">
+      <source src="../assets/sounds/door-locked.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-key" preload="auto">
+      <source src="../assets/sounds/keys.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfx-drawer-open" preload="auto">
+      <source src="../assets/sounds/drawer-open.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfx-box-open" preload="auto">
+      <source src="../assets/sounds/box-open.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfx-wakeup" preload="auto">
+      <source src="../assets/sounds/man-waking-up.mp3" type="audio/mpeg" />
     </audio>
 
     <!-- Script do nível -->

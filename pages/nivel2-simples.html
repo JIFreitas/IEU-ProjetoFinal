@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Nível 2 - Acenda 4 Velas</title>
+    <title>Nível 2 - Ordem das Datas</title>
 
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
@@ -17,7 +17,7 @@
   <body>
     <div id="hud">
       <div>Velas: <span id="candles">0</span>/4</div>
-      <div id="msg">Procura o isqueiro e segue a pista do quadro.</div>
+      <div id="msg">Encontra o isqueiro e acende por ordem (data mais antiga → mais recente).</div>
       <div class="hud-hint">Pressione ESC para pausar</div>
     </div>
 
@@ -62,236 +62,250 @@
         Menu Principal
       </button>
     </div>
+    <a-scene fog="type: exponential; color: #060606; density: 0.03">
+      <a-assets>
+        <canvas id="tex-floor" width="512" height="512"></canvas>
+        <canvas id="tex-wall" width="512" height="512"></canvas>
+        <canvas id="tex-wood" width="512" height="512"></canvas>
+        <canvas id="tex-ceiling" width="512" height="512"></canvas>
+      </a-assets>
 
-    <a-scene>
-      <a-sky color="#050505"></a-sky>
+      <a-sky color="#040404"></a-sky>
 
       <!-- Chão -->
       <a-plane
+        id="floor"
         position="0 0 -5"
         rotation="-90 0 0"
         width="4"
         height="19.6"
-        color="#1a1410"
+        material="shader: standard; color: #6a5646; roughness: 1; metalness: 0"
         nav-mesh
       ></a-plane>
 
+      <!-- Tapete/corredor (só visual) -->
+      <a-plane
+        position="0 0.01 -5"
+        rotation="-90 0 0"
+        width="1.25"
+        height="18.8"
+        material="shader: standard; color: #1a1512; roughness: 1; metalness: 0; opacity: 0.7; transparent: true"
+      ></a-plane>
+
+      <!-- Clutter no chão (para o corredor não estar vazio) -->
+      <a-box position="-1.75 0.22 2.9" width="0.55" height="0.44" depth="0.55" material="shader: standard; src: #tex-wood; roughness: 0.95; metalness: 0.02; color: #3f2514"></a-box>
+      <a-box position="1.65 0.18 1.1" width="0.45" height="0.35" depth="0.45" material="shader: standard; src: #tex-wood; roughness: 0.95; metalness: 0.02; color: #3f2514"></a-box>
+
+      <a-cylinder position="-1.8 0.32 -1.3" radius="0.18" height="0.64" material="shader: standard; color: #2a201b; roughness: 1"></a-cylinder>
+      <a-cylinder position="1.8 0.32 -3.4" radius="0.18" height="0.64" material="shader: standard; color: #2a201b; roughness: 1"></a-cylinder>
+
+      <a-plane position="-1.2 0.012 -6.2" rotation="-90 28 0" width="0.55" height="0.38" material="color: #cbbba6; opacity: 0.22; roughness: 1; metalness: 0; transparent: true"></a-plane>
+      <a-plane position="1.25 0.012 -9.4" rotation="-90 -18 0" width="0.48" height="0.34" material="color: #cbbba6; opacity: 0.2; roughness: 1; metalness: 0; transparent: true"></a-plane>
+
+      <a-box position="-1.7 0.14 -12.8" width="0.6" height="0.28" depth="0.6" material="shader: standard; src: #tex-wood; roughness: 0.95; metalness: 0.02; color: #3a2214"></a-box>
+      <a-box position="1.55 0.12 -13.6" width="0.48" height="0.24" depth="0.48" material="shader: standard; src: #tex-wood; roughness: 0.95; metalness: 0.02; color: #3a2214"></a-box>
+
       <!-- Paredes corredor -->
       <a-box
+        class="wall"
         position="-2.5 2 -5"
         width="0.2"
         height="4"
         depth="20"
-        color="#3a2510"
+        material="shader: standard; color: #c9b7a1; roughness: 1; metalness: 0"
       ></a-box>
       <a-box
+        class="wall"
         position="2.5 2 -5"
         width="0.2"
         height="4"
         depth="20"
-        color="#3a2510"
+        material="shader: standard; color: #c9b7a1; roughness: 1; metalness: 0"
       ></a-box>
       <a-box
+        class="wall"
         position="0 2 5"
         width="6"
         height="4"
         depth="0.2"
-        color="#3a2510"
+        material="shader: standard; color: #c9b7a1; roughness: 1; metalness: 0"
       ></a-box>
       <a-box
+        class="wall"
         position="0 2 -15"
         width="6"
         height="4"
         depth="0.2"
-        color="#3a2510"
+        material="shader: standard; color: #c9b7a1; roughness: 1; metalness: 0"
       ></a-box>
 
       <!-- Teto -->
       <a-plane
+        id="ceiling"
         position="0 4 -5"
         rotation="90 0 0"
         width="6"
         height="20"
-        color="#0a0a0a"
+        material="shader: standard; color: #f0eee8; roughness: 1; metalness: 0"
       ></a-plane>
 
-      <!-- QUADRO (clicável) -->
-      <a-entity
-        id="order-board"
-        class="interactable"
-        position="2.35 2.2 -9"
-        rotation="0 -90 0"
-      >
-        <a-plane
-          class="interactable"
-          width="4.5"
-          height="1.5"
-          color="#2b1b10"
-        ></a-plane>
+      <!-- ARMÁRIO + GAVETA (isqueiro fica aqui, como no nível 1) -->
+      <a-entity id="lighter-cabinet" position="-1.4 0 4.35" rotation="0 180 0">
+        <a-box
+          position="0 0.55 0"
+          width="1.15"
+          height="1.1"
+          depth="0.5"
+          material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"
+        ></a-box>
 
-        <a-text
-          class="interactable"
-          value="ORDEM DOS ELEMENTOS"
-          position="0 0.35 0.01"
-          align="center"
-          color="#d8c7a6"
-          width="6"
-        ></a-text>
+        <a-box
+          id="lighter-drawer"
+          class="interactable drawer"
+          position="0 0.7 0.23"
+          width="0.95"
+          height="0.22"
+          depth="0.16"
+          material="shader: standard; src: #tex-wood; roughness: 0.92; metalness: 0.02; color: #2a1a10"
+        ></a-box>
 
-        <!-- Texto escondido (aparece ao clicar) -->
-        <a-text
-          id="order-text"
-          value="2 → 4 → 1 → 3"
+        <!-- Isqueiro escondido dentro da gaveta (visível após abrir) -->
+        <a-box
+          id="lighter"
+          class="interactable"
           visible="false"
-          position="0 -0.25 0.01"
-          align="center"
-          color="#ffffaa"
-          width="6"
-        ></a-text>
+          position="0.22 0.72 0.14"
+          width="0.22"
+          height="0.08"
+          depth="0.12"
+          material="shader: standard; color: #cfcfcf; metalness: 0.8; roughness: 0.25"
+        ></a-box>
       </a-entity>
 
-      <!-- ISQUEIRO (clicável) -->
-      <a-box
-        id="lighter"
-        class="interactable"
-        position="0 0.6 -2"
-        width="0.25"
-        height="0.08"
-        depth="0.12"
-        color="#cfcfcf"
-        animation="property: rotation; to: 0 360 0; loop: true; dur: 3500"
-      ></a-box>
+      <!-- ===== 4 ESTAÇÕES (estante + vela + quadro com data) ===== -->
+      <!-- Estação A (data mais antiga) -->
+      <a-entity position="-1.55 0 -6.6" rotation="0 90 0">
+        <!-- estante -->
+        <a-box position="0 0.6 0" width="1.3" height="1.2" depth="0.45" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-box>
+        <!-- coisas em cima -->
+        <a-box position="-0.35 1.24 0.05" width="0.42" height="0.06" depth="0.26" rotation="0 18 0" material="color: #2d2d2d; roughness: 0.98"></a-box>
+        <a-box position="-0.35 1.3 0.05" width="0.38" height="0.05" depth="0.22" rotation="0 18 0" material="color: #6b2a2a; roughness: 0.95"></a-box>
+        <a-box position="0.25 1.25 -0.06" width="0.28" height="0.08" depth="0.2" rotation="0 -10 0" material="color: #3b3b3b; roughness: 0.98"></a-box>
+
+        <!-- vela -->
+        <a-cylinder id="candle1" class="candle interactable" position="0.05 1.26 0.13" radius="0.08" height="0.22" color="#d8cfc0" data-date="2004-12-20"></a-cylinder>
+        <a-sphere id="flame1" visible="false" position="0.05 1.4 0.13" radius="0.09" color="#ff7a1a" animation="property: scale; from: 1 1 1; to: 1.25 1.25 1.25; dir: alternate; loop: true; dur: 260"></a-sphere>
+      </a-entity>
+      <a-entity position="-2.39 2.15 -6.6" rotation="0 90 0">
+        <a-plane width="1.1" height="0.75" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-plane>
+        <a-plane position="0 0 0.01" width="0.95" height="0.6" color="#151515"></a-plane>
+        <a-text value="20/12/2004" position="0 0 0.03" align="center" color="#ffffdd" width="2.2"></a-text>
+      </a-entity>
+
+      <!-- Estação B -->
+      <a-entity position="1.55 0 -8.4" rotation="0 -90 0">
+        <a-box position="0 0.6 0" width="1.3" height="1.2" depth="0.45" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-box>
+        <a-box position="-0.3 1.25 0.04" width="0.3" height="0.09" depth="0.22" rotation="0 -12 0" material="color: #3b3b3b; roughness: 0.98"></a-box>
+        <a-box position="0.22 1.29 0.04" width="0.06" height="0.24" depth="0.18" rotation="0 -12 0" material="color: #2a4a6b; roughness: 0.95"></a-box>
+        <a-box position="0.32 1.29 0.04" width="0.06" height="0.2" depth="0.18" rotation="0 -12 0" material="color: #4a6b2a; roughness: 0.95"></a-box>
+
+        <a-cylinder id="candle2" class="candle interactable" position="0.05 1.26 0.13" radius="0.08" height="0.22" color="#d8cfc0" data-date="1921-03-14"></a-cylinder>
+        <a-sphere id="flame2" visible="false" position="0.05 1.4 0.13" radius="0.09" color="#ff7a1a" animation="property: scale; from: 1 1 1; to: 1.25 1.25 1.25; dir: alternate; loop: true; dur: 260"></a-sphere>
+      </a-entity>
+      <a-entity position="2.39 2.15 -8.4" rotation="0 -90 0">
+        <a-plane width="1.1" height="0.75" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-plane>
+        <a-plane position="0 0 0.01" width="0.95" height="0.6" color="#151515"></a-plane>
+        <a-text value="14/03/1921" position="0 0 0.03" align="center" color="#ffffdd" width="2.2"></a-text>
+      </a-entity>
+
+      <!-- Estação C -->
+      <a-entity position="-1.55 0 -10.4" rotation="0 90 0">
+        <a-box position="0 0.6 0" width="1.3" height="1.2" depth="0.45" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-box>
+        <a-box position="-0.2 1.25 -0.08" width="0.25" height="0.06" depth="0.18" rotation="0 10 0" material="color: #6b5a2a; roughness: 0.95"></a-box>
+        <a-box position="0.25 1.25 0.04" width="0.28" height="0.08" depth="0.2" rotation="0 6 0" material="color: #2d2d2d; roughness: 0.98"></a-box>
+        <a-cylinder position="0.48 1.25 -0.06" radius="0.05" height="0.08" material="color: #2a201b; roughness: 1"></a-cylinder>
+
+        <a-cylinder id="candle3" class="candle interactable" position="0.05 1.26 0.13" radius="0.08" height="0.22" color="#d8cfc0" data-date="2019-05-08"></a-cylinder>
+        <a-sphere id="flame3" visible="false" position="0.05 1.4 0.13" radius="0.09" color="#ff7a1a" animation="property: scale; from: 1 1 1; to: 1.25 1.25 1.25; dir: alternate; loop: true; dur: 260"></a-sphere>
+      </a-entity>
+      <a-entity position="-2.39 2.15 -10.4" rotation="0 90 0">
+        <a-plane width="1.1" height="0.75" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-plane>
+        <a-plane position="0 0 0.01" width="0.95" height="0.6" color="#151515"></a-plane>
+        <a-text value="08/05/2019" position="0 0 0.03" align="center" color="#ffffdd" width="2.2"></a-text>
+      </a-entity>
+
+      <!-- Estação D (data mais recente) -->
+      <a-entity position="1.55 0 -12.2" rotation="0 -90 0">
+        <a-box position="0 0.6 0" width="1.3" height="1.2" depth="0.45" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-box>
+        <a-box position="-0.45 1.24 0.05" width="0.34" height="0.08" depth="0.22" rotation="0 22 0" material="color: #3b3b3b; roughness: 0.98"></a-box>
+        <a-box position="0.18 1.24 -0.1" width="0.25" height="0.06" depth="0.18" rotation="0 -12 0" material="color: #2a4a6b; roughness: 0.95"></a-box>
+        <a-box position="0.36 1.31 -0.1" width="0.06" height="0.22" depth="0.16" rotation="0 -12 0" material="color: #4a6b2a; roughness: 0.95"></a-box>
+        <a-cylinder position="0.55 1.25 0.12" radius="0.05" height="0.08" material="color: #2a201b; roughness: 1"></a-cylinder>
+
+        <a-cylinder id="candle4" class="candle interactable" position="0.05 1.26 0.13" radius="0.08" height="0.22" color="#d8cfc0" data-date="1978-09-02"></a-cylinder>
+        <a-sphere id="flame4" visible="false" position="0.05 1.4 0.13" radius="0.09" color="#ff7a1a" animation="property: scale; from: 1 1 1; to: 1.25 1.25 1.25; dir: alternate; loop: true; dur: 260"></a-sphere>
+      </a-entity>
+      <a-entity position="2.39 2.15 -12.2" rotation="0 -90 0">
+        <a-plane width="1.1" height="0.75" material="shader: standard; src: #tex-wood; roughness: 0.9; metalness: 0.02; color: #4b2b15"></a-plane>
+        <a-plane position="0 0 0.01" width="0.95" height="0.6" color="#151515"></a-plane>
+        <a-text value="02/09/1978" position="0 0 0.03" align="center" color="#ffffdd" width="2.2"></a-text>
+      </a-entity>
+
+      <!-- ===== Porta (moldura fixa + folha com dobradiça) ===== -->
+      <a-entity id="doorframe" position="0 1.59 -14.9">
+        <a-box
+          position="0 0 0.06"
+          width="2.18"
+          height="3.18"
+          depth="0.08"
+          material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.8; metalness: 0.02; color: #5b331a"
+        ></a-box>
+      </a-entity>
+
+      <a-entity id="doorPivot" position="-1 1.59 -14.9">
+        <a-box
+          id="door"
+          class="interactable"
+          position="1 0 0"
+          width="2"
+          height="3"
+          depth="0.22"
+          material="opacity: 0; transparent: true"
+        ></a-box>
+
+        <a-box
+          position="1 0 0.1"
+          width="1.92"
+          height="2.92"
+          depth="0.1"
+          material="shader: standard; src: #tex-wood; repeat: 1 1; roughness: 0.85; metalness: 0.02; color: #6a3a1d"
+        ></a-box>
+
+        <a-sphere position="1.78 0.05 0.18" radius="0.09" material="shader: standard; color: #b9b9b9; metalness: 0.9; roughness: 0.3"></a-sphere>
+      </a-entity>
+
+      <!-- Texto da porta (só aparece quando tentar antes de resolver) -->
+      <a-plane
+        id="door-text-bg"
+        visible="false"
+        position="0 3.14 -14.7"
+        width="2.2"
+        height="0.38"
+        material="color: #000; opacity: 0.55; transparent: true"
+      ></a-plane>
       <a-text
-        value="?"
-        position="0 0.9 -2"
+        id="door-text"
+        visible="false"
+        value="PORTA TRANCADA"
+        position="0 3.14 -14.69"
         align="center"
-        color="#ffffff"
-        width="3"
+        color="#ffdddd"
+        width="4.5"
       ></a-text>
 
-      <!-- Velas -->
-      <a-entity position="-1 1.5 -8">
-        <a-cylinder
-          id="candle1"
-          class="candle interactable"
-          radius="0.1"
-          height="0.5"
-          color="#8b4513"
-          data-order="1"
-        ></a-cylinder>
-        <a-text
-          value="1"
-          position="0 0.8 0"
-          align="center"
-          color="#ffffff"
-          width="3"
-        ></a-text>
-        <a-sphere
-          id="flame1"
-          visible="false"
-          position="0 0.4 0"
-          radius="0.15"
-          color="#ff6600"
-          animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 300"
-        ></a-sphere>
-      </a-entity>
-
-      <a-entity position="1 1.5 -8">
-        <a-cylinder
-          id="candle2"
-          class="candle interactable"
-          radius="0.1"
-          height="0.5"
-          color="#8b4513"
-          data-order="2"
-        ></a-cylinder>
-        <a-text
-          value="2"
-          position="0 0.8 0"
-          align="center"
-          color="#ffffff"
-          width="3"
-        ></a-text>
-        <a-sphere
-          id="flame2"
-          visible="false"
-          position="0 0.4 0"
-          radius="0.15"
-          color="#ff6600"
-          animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 300"
-        ></a-sphere>
-      </a-entity>
-
-      <a-entity position="-1 1.5 -12">
-        <a-cylinder
-          id="candle3"
-          class="candle interactable"
-          radius="0.1"
-          height="0.5"
-          color="#8b4513"
-          data-order="3"
-        ></a-cylinder>
-        <a-text
-          value="3"
-          position="0 0.8 0"
-          align="center"
-          color="#ffffff"
-          width="3"
-        ></a-text>
-        <a-sphere
-          id="flame3"
-          visible="false"
-          position="0 0.4 0"
-          radius="0.15"
-          color="#ff6600"
-          animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 300"
-        ></a-sphere>
-      </a-entity>
-
-      <a-entity position="1 1.5 -12">
-        <a-cylinder
-          id="candle4"
-          class="candle interactable"
-          radius="0.1"
-          height="0.5"
-          color="#8b4513"
-          data-order="4"
-        ></a-cylinder>
-        <a-text
-          value="4"
-          position="0 0.8 0"
-          align="center"
-          color="#ffffff"
-          width="3"
-        ></a-text>
-        <a-sphere
-          id="flame4"
-          visible="false"
-          position="0 0.4 0"
-          radius="0.15"
-          color="#ff6600"
-          animation="property: scale; from: 1 1 1; to: 1.2 1.2 1.2; dir: alternate; loop: true; dur: 300"
-        ></a-sphere>
-      </a-entity>
-
-      <!-- Porta -->
-      <a-box
-        id="door"
-        class="interactable"
-        position="0 2 -15"
-        width="2"
-        height="3"
-        depth="0.1"
-        color="#663300"
-      ></a-box>
-
       <!-- Luz -->
-      <a-light type="ambient" intensity="0.2"></a-light>
-      <a-light
-        type="point"
-        position="0 3 -8"
-        intensity="0.5"
-        color="#ffaa66"
+      <a-light type="ambient" intensity="0.18"></a-light>
+      <a-light type="point" position="0 3 -7" intensity="0.65" color="#ffbb88" distance="20"></a-light>
       ></a-light>
 
       <!-- Rig -->
@@ -320,7 +334,30 @@
       <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
     </audio>
 
+    <audio id="sfx-door-open" preload="auto">
+      <source src="../assets/sounds/door-opening.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-door-locked" preload="auto">
+      <source src="../assets/sounds/door-locked.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-drawer-open" preload="auto">
+      <source src="../assets/sounds/drawer-open.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-pickup" preload="auto">
+      <source src="../assets/sounds/keys.mp3" type="audio/mpeg" />
+    </audio>
+
+    <audio id="sfx-hmm-reflexion" preload="auto">
+      <source src="../assets/sounds/hmm-reflexion.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-find-lighter" preload="auto">
+      <source src="../assets/sounds/find-lighter.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="sfx-light-candle" preload="auto">
+      <source src="../assets/sounds/acender-vela.mp3" type="audio/mpeg" />
+    </audio>
+
     <!-- Script do nível -->
-    <script src="../assets/scripts/levels/level2.js"></script>
+    <script src="../assets/scripts/levels/level2.js?v=3"></script>
   </body>
 </html>
