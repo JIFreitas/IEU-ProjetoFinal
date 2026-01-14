@@ -7,7 +7,16 @@ window.addEventListener("DOMContentLoaded", () => {
   let uvOn = false;
   let solved = false;
 
+  // Ícones simples (sem imagens)
+  const SYMBOL_ICON = {
+    TRI: "▲",
+    CIR: "●",
+    SQR: "■",
+    X: "✖",
+  };
+
   const SYMBOLS = ["TRI", "CIR", "SQR", "X"];
+
   const symbolToDigit = {};
 
   // O terminal deve pedir os 4 símbolos (sem ordem por sequência).
@@ -85,7 +94,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const v = Math.max(0, Math.min(1, next));
     clueOpacity[sym] = v;
 
-    // só visível com opacidade mínima
     el.setAttribute("visible", v > 0.02 ? "true" : "false");
     el.setAttribute("material", `transparent: true; opacity: ${v}`);
   }
@@ -100,6 +108,33 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Atualiza labels do terminal conforme a ORDEM atual (slot 0..3)
+  function refreshTerminalLabels() {
+    for (let i = 0; i < 4; i++) {
+      const sym = terminalOrder[i];
+      const label = document.querySelector(`label[for="term-slot-${i}"]`);
+      if (label) {
+        label.textContent = SYMBOL_ICON[sym];
+        label.style.fontSize = "22px";
+      }
+    }
+  }
+
+  // Atualiza texto da ordem (VERTICAL)
+  function refreshOrderText() {
+    if (!orderText) return;
+    orderText.innerHTML =
+      "Ordem no terminal:<br>" +
+      terminalOrder
+        .map(
+          (s, i) =>
+            `${i + 1}. <b style="font-size:18px;letter-spacing:2px">${
+              SYMBOL_ICON[s]
+            }</b>`
+        )
+        .join("<br>");
+  }
+
   function initCode() {
     const digits = shuffle([
       randDigit(),
@@ -109,28 +144,32 @@ window.addEventListener("DOMContentLoaded", () => {
     ]);
     SYMBOLS.forEach((s, i) => (symbolToDigit[s] = digits[i]));
 
+    // Pistas nas paredes: usar ÍCONE + dígito (ex: ●:3)
     SYMBOLS.forEach((sym) => {
       const el = document.getElementById(`uv-${sym}`);
       if (!el) return;
 
       clueEls[sym] = el;
+      el.setAttribute("value", `${SYMBOL_ICON[sym]}:${symbolToDigit[sym]}`);
 
-      el.setAttribute("value", `${sym}:${symbolToDigit[sym]}`);
-
-      // blindagem (nunca aparece sem UV)
       el.setAttribute("visible", "false");
       el.setAttribute("material", "transparent: true; opacity: 0");
 
-      // opcional: melhora nitidez (se suportar)
       try {
         el.setAttribute("shader", "msdf");
       } catch {}
     });
 
+<<<<<<< HEAD
     if (orderText) {
       orderText.textContent =
         "Sem ordem: preenche o dígito de cada símbolo (TRI, X, CIR, SQR).";
     }
+=======
+    terminalOrder = shuffle(SYMBOLS);
+    refreshOrderText();
+    refreshTerminalLabels();
+>>>>>>> 7750c5b7350183e359a7df6d628ff5d4fc1d4294
   }
 
   initCode();
@@ -139,13 +178,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const uvSpot = document.getElementById("uv-spot");
 
   function applyUVVisuals() {
-    // Mantém isto consistente com o teu HTML atual (mais alcance)
     if (uvSpot) {
-      uvSpot.setAttribute("intensity", uvOn ? "4.2" : "0");
-      uvSpot.setAttribute("distance", "24");
-      uvSpot.setAttribute("decay", "0.6");
-      uvSpot.setAttribute("angle", "22");
-      uvSpot.setAttribute("penumbra", "0.35");
+      // 🔻 Feixe mais pequeno + menos alcance (ajusta à vontade)
+      uvSpot.setAttribute("intensity", uvOn ? "2.2" : "0");
+      uvSpot.setAttribute("distance", "8");
+      uvSpot.setAttribute("decay", "1.2");
+      uvSpot.setAttribute("angle", "10");
+      uvSpot.setAttribute("penumbra", "0.15");
     }
     if (!uvOn) hideAllClues();
   }
@@ -183,7 +222,8 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===== Revelar por “passar o feixe” =====
-  const REVEAL_RADIUS = 0.6; // mais fácil com o teu cenário
+  // 🔻 mais difícil apanhar de longe
+  const REVEAL_RADIUS = 0.28;
   const FADE_IN = 0.25;
   const FADE_OUT = 0.16;
 
@@ -197,7 +237,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function getWorldPos(el) {
-    // Evita crash se THREE ainda não estiver pronto
     if (!el || !el.object3D || !window.THREE) return null;
     return el.object3D.getWorldPosition(new THREE.Vector3());
   }
@@ -218,7 +257,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const hits = rc.intersections || [];
     const hit = hits[0];
 
-    // Se não bate em nada: fade out
     if (!hit || !hit.point) {
       SYMBOLS.forEach((sym) =>
         setClueOpacity(sym, clueOpacity[sym] - FADE_OUT)
@@ -226,7 +264,6 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Não revelar se estás a apontar para um interactable (terminal, drawer, etc.)
     const targetEl = hit.object?.el;
     if (targetEl && targetEl.classList?.contains("interactable")) {
       SYMBOLS.forEach((sym) =>
@@ -237,7 +274,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const p = hit.point;
 
-    // texto mais próximo do ponto do feixe
     let bestSym = null;
     let bestD = Infinity;
 
@@ -303,6 +339,12 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function reshuffleOrder() {
+    terminalOrder = shuffle(SYMBOLS);
+    refreshOrderText();
+    refreshTerminalLabels();
+  }
+
   function validateCode() {
     const slots = [0, 1, 2, 3].map(readSlot);
 
@@ -322,6 +364,11 @@ window.addEventListener("DOMContentLoaded", () => {
       playSfx("sfx-door-locked", 0.85);
       clearSlots();
 
+<<<<<<< HEAD
+=======
+      reshuffleOrder();
+
+>>>>>>> 7750c5b7350183e359a7df6d628ff5d4fc1d4294
       if (codeMsg) {
         codeMsg.style.color = "#ff4444";
         codeMsg.textContent = "✗ Errado. Confere os 4 símbolos e tenta outra vez.";
@@ -365,7 +412,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // UX: 1 dígito -> avança para o próximo (bom em mobile)
+  // UX: 1 dígito -> avança para o próximo
   ["term-slot-0", "term-slot-1", "term-slot-2", "term-slot-3"].forEach(
     (id, idx) => {
       const el = document.getElementById(id);
@@ -383,7 +430,6 @@ window.addEventListener("DOMContentLoaded", () => {
           const ok = validateCode();
           if (ok) setTimeout(closeCodeOverlay, 650);
         }
-        // backspace vazio -> volta atrás
         if (e.key === "Backspace" && !el.value && idx > 0) {
           document.getElementById(`term-slot-${idx - 1}`)?.focus();
         }
@@ -483,7 +529,7 @@ window.addEventListener("DOMContentLoaded", () => {
           }
           openCodeOverlay();
           setMsg(
-            "⌨️ Insere o código por ordem de símbolos.",
+            "⌨️ Insere o código pela ordem indicada.",
             "#00ff00",
             1200,
             "Usa as pistas UV para obter os dígitos."
