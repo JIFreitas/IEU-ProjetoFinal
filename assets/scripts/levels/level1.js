@@ -297,7 +297,7 @@ window.addEventListener("DOMContentLoaded", () => {
     startLevelTimer({
       seconds: 90,
       onTimeout: () => {
-        msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
+        msgDiv.textContent = "Tempo esgotado! A recomeçar o nível...";
         msgDiv.style.color = "#ff0000";
         setTimeout(() => location.reload(), 1500);
       },
@@ -422,13 +422,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
           this.el.setAttribute("visible", "false");
 
-          msgDiv.textContent = `🔑 Chave apanhada! (${keysFound}/3)`;
+          msgDiv.textContent = `Chave apanhada! (${keysFound}/3)`;
           msgDiv.style.color = "#00ff00";
           msgDiv.style.fontSize = "18px";
 
           if (keysFound === 3) {
             setTimeout(() => {
-              msgDiv.textContent = "✅ Tens as 3 chaves! Agora abre a porta!";
+              msgDiv.textContent = "Tens as 3 chaves! Agora abre a porta!";
               msgDiv.style.color = "#00ff00";
               doorEl?.classList.add("unlocked");
             }, 600);
@@ -462,7 +462,7 @@ window.addEventListener("DOMContentLoaded", () => {
             easing: "easeOutQuad",
           });
 
-          revealKey("key1", "👀 A gaveta abriu... está aqui uma chave!");
+          revealKey("key1", "A gaveta abriu... está aqui uma chave!");
         });
       },
     });
@@ -487,7 +487,7 @@ window.addEventListener("DOMContentLoaded", () => {
             easing: "easeOutQuad",
           });
 
-          revealKey("key2", "📦 Abriste a caixa... há uma chave lá dentro!");
+          revealKey("key2", "Abriste a caixa... há uma chave lá dentro!");
         });
       },
     });
@@ -556,7 +556,7 @@ window.addEventListener("DOMContentLoaded", () => {
             playSfx(sfxDoorLocked);
             showDoorLockedText();
 
-            msgDiv.textContent = `❌ Faltam ${3 - keysFound} chaves.`;
+            msgDiv.textContent = `Faltam ${3 - keysFound} chaves.`;
             msgDiv.style.color = "#ff0000";
             msgDiv.style.fontSize = "18px";
 

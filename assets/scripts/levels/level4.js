@@ -9,7 +9,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const SYMBOLS = ["TRI", "CIR", "SQR", "X"];
   const symbolToDigit = {};
-  let terminalOrder = [];
+
+  // O terminal deve pedir os 4 símbolos (sem ordem por sequência).
+  // Estes símbolos correspondem aos inputs do HTML (term-slot-0..3).
+  const TERMINAL_SLOT_SYMBOLS = ["TRI", "X", "CIR", "SQR"];
 
   // ===== UI =====
   const msgDiv = document.getElementById("msg");
@@ -124,9 +127,9 @@ window.addEventListener("DOMContentLoaded", () => {
       } catch {}
     });
 
-    terminalOrder = shuffle(SYMBOLS);
     if (orderText) {
-      orderText.textContent = "Ordem no terminal: " + terminalOrder.join(" → ");
+      orderText.textContent =
+        "Sem ordem: preenche o dígito de cada símbolo (TRI, X, CIR, SQR).";
     }
   }
 
@@ -312,26 +315,20 @@ window.addEventListener("DOMContentLoaded", () => {
       return false;
     }
 
-    const expected = terminalOrder.map((sym) => symbolToDigit[sym]);
+    const expected = TERMINAL_SLOT_SYMBOLS.map((sym) => symbolToDigit[sym]);
     const ok = slots.every((v, i) => v === expected[i]);
 
     if (!ok) {
       playSfx("sfx-door-locked", 0.85);
       clearSlots();
 
-      terminalOrder = shuffle(SYMBOLS);
-      if (orderText) {
-        orderText.textContent =
-          "Ordem no terminal: " + terminalOrder.join(" → ");
-      }
-
       if (codeMsg) {
         codeMsg.style.color = "#ff4444";
-        codeMsg.textContent = "✗ Errado. A ordem do terminal mudou...";
+        codeMsg.textContent = "✗ Errado. Confere os 4 símbolos e tenta outra vez.";
       }
 
       setMsg(
-        "❌ Código errado. A ordem mudou — volta às paredes.",
+        "❌ Código errado. Volta a ver os símbolos com UV.",
         "#ff4444",
         1600,
         "Aponta às paredes com UV e abre o terminal."

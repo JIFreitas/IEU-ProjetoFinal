@@ -227,7 +227,7 @@ window.addEventListener("DOMContentLoaded", () => {
   startLevelTimer({
     seconds: 120,
     onTimeout: () => {
-      msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
+      msgDiv.textContent = "Tempo esgotado! A recomeçar o nível...";
       msgDiv.style.color = "#ff0000";
       setTimeout(() => location.reload(), 1500);
     },
@@ -309,7 +309,7 @@ window.addEventListener("DOMContentLoaded", () => {
             );
           }
 
-          setMsg("👀 Abriste a gaveta...", "#ffffaa", 1400, "Encontra o isqueiro e acende por ordem.");
+          setMsg("Abriste a gaveta...", "#ffffaa", 1400, "Encontra o isqueiro e acende por ordem.");
         });
       },
     });
@@ -358,7 +358,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
           const expectedEl = requiredCandleOrder[candlesLit];
           if (!expectedEl) {
-            setMsg("⚠️ Erro interno: ordem das velas inválida.", "#ff0000");
+            setMsg("Erro interno: ordem das velas inválida.", "#ff0000");
             return;
           }
 
