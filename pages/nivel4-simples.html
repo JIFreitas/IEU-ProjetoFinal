@@ -1,583 +1,583 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Nível 4 - Final (UV Terminal)</title>
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+      <title>Nível 4 - Final (UV Terminal)</title>
 
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
+      <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.1/dist/aframe-extras.min.js"></script>
 
-    <link rel="stylesheet" href="../assets/styles/common.css" />
+      <link rel="stylesheet" href="../assets/styles/common.css" />
 
-    <script defer src="../assets/scripts/common.js"></script>
-    <script defer src="../assets/scripts/game.js"></script>
+      <script defer src="../assets/scripts/common.js"></script>
+      <script defer src="../assets/scripts/game.js"></script>
 
-    <style>
-      /* Overlay do código */
-      #code-overlay {
-        position: fixed;
-        inset: 0;
-        display: none;
-        z-index: 2500;
-        background: rgba(0, 0, 0, 0.7);
-        align-items: center;
-        justify-content: center;
-        padding: 18px;
-      }
+      <style>
+        /* Overlay do código */
+        #code-overlay {
+          position: fixed;
+          inset: 0;
+          display: none;
+          z-index: 2500;
+          background: rgba(0, 0, 0, 0.7);
+          align-items: center;
+          justify-content: center;
+          padding: 18px;
+        }
 
-      #code-overlay .panel {
-        width: min(720px, calc(100vw - 36px));
-        background: rgba(0, 0, 0, 0.95);
-        border: 2px solid rgba(180, 100, 255, 0.5);
-        border-radius: 18px;
-        padding: 22px 22px 18px;
-        color: #e8e8e8;
-        box-shadow: 0 0 50px rgba(180, 100, 255, 0.15);
-      }
+        #code-overlay .panel {
+          width: min(720px, calc(100vw - 36px));
+          background: rgba(0, 0, 0, 0.95);
+          border: 2px solid rgba(180, 100, 255, 0.5);
+          border-radius: 18px;
+          padding: 22px 22px 18px;
+          color: #e8e8e8;
+          box-shadow: 0 0 50px rgba(180, 100, 255, 0.15);
+        }
 
-      #code-overlay .code-grid {
-        margin-top: 18px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px 18px;
-      }
-
-      #code-overlay .code-slot {
-        display: grid;
-        grid-template-columns: 56px 1fr;
-        align-items: center;
-        gap: 12px;
-      }
-
-      #code-overlay label {
-        font-weight: 900;
-        letter-spacing: 1px;
-        color: #ffffff;
-        opacity: 0.95;
-      }
-
-      #code-overlay input {
-        font-size: 28px;
-        padding: 12px 14px;
-        text-align: center;
-        border: 2px solid rgba(180, 100, 255, 0.45);
-        background: #070707;
-        color: #f0dcff;
-        border-radius: 14px;
-        outline: none;
-      }
-
-      #code-overlay .actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 18px;
-      }
-
-      #code-overlay button {
-        font-size: 16px;
-        padding: 12px 16px;
-        border-radius: 12px;
-        border: none;
-        cursor: pointer;
-      }
-
-      #code-confirm {
-        background: #b86bff;
-        color: #0b0014;
-        font-weight: 900;
-      }
-
-      #code-close {
-        background: #333;
-        color: #fff;
-      }
-
-      @media (max-width: 560px) {
         #code-overlay .code-grid {
-          grid-template-columns: 1fr;
+          margin-top: 18px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px 18px;
         }
-      }
 
-      /* Jumpscare */
-      #jumpscare {
-        position: fixed;
-        inset: 0;
-        display: none;
-        z-index: 99999;
-        background: #000;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-      }
-      #jumpscare.on {
-        animation: flicker 0.15s infinite;
-      }
-      #jumpscare .face {
-        width: min(520px, 90vw);
-        height: min(520px, 60vh);
-        border-radius: 22px;
-        background: radial-gradient(
-            circle at 50% 40%,
-            rgba(255, 255, 255, 0.1),
-            rgba(0, 0, 0, 0.9)
-          ),
-          radial-gradient(
-            circle at 35% 40%,
-            rgba(255, 0, 0, 0.95),
-            rgba(0, 0, 0, 0) 55%
-          ),
-          radial-gradient(
-            circle at 65% 40%,
-            rgba(255, 0, 0, 0.95),
-            rgba(0, 0, 0, 0) 55%
-          ),
-          radial-gradient(
-            circle at 50% 70%,
-            rgba(255, 255, 255, 0.12),
-            rgba(0, 0, 0, 0) 60%
-          );
-        box-shadow: 0 0 50px rgba(255, 0, 0, 0.55);
-      }
-      #jumpscare-text {
-        margin-top: 18px;
-        color: #fff;
-        font-size: 34px;
-        font-weight: 900;
-        letter-spacing: 2px;
-        text-shadow: 0 0 18px rgba(255, 0, 0, 0.55);
-      }
-      @keyframes flicker {
-        0% {
-          filter: brightness(1);
-          transform: scale(1);
+        #code-overlay .code-slot {
+          display: grid;
+          grid-template-columns: 56px 1fr;
+          align-items: center;
+          gap: 12px;
         }
-        50% {
-          filter: brightness(1.35);
-          transform: scale(1.01);
+
+        #code-overlay label {
+          font-weight: 900;
+          letter-spacing: 1px;
+          color: #ffffff;
+          opacity: 0.95;
         }
-        100% {
-          filter: brightness(0.9);
-          transform: scale(1);
+
+        #code-overlay input {
+          font-size: 28px;
+          padding: 12px 14px;
+          text-align: center;
+          border: 2px solid rgba(180, 100, 255, 0.45);
+          background: #070707;
+          color: #f0dcff;
+          border-radius: 14px;
+          outline: none;
         }
-      }
-    </style>
-  </head>
 
-  <body>
-    <div id="hud">
-      <div>Final: <span style="color: #d39bff">UV</span> + Terminal</div>
-      <div id="msg">Encontra a lanterna UV. Esta sala não perdoa.</div>
-      <div class="hud-hint">ESC pausa | U liga/desliga UV</div>
-    </div>
+        #code-overlay .actions {
+          display: flex;
+          gap: 12px;
+          margin-top: 18px;
+        }
 
-    <div id="timer-top" class="timer-top" aria-label="Tempo restante">
-      <span id="timer-text">00:00</span>
-    </div>
+        #code-overlay button {
+          font-size: 16px;
+          padding: 12px 16px;
+          border-radius: 12px;
+          border: none;
+          cursor: pointer;
+        }
 
-    <div id="pause-menu" class="theme-red">
-      <h2>JOGO PAUSADO</h2>
+        #code-confirm {
+          background: #b86bff;
+          color: #0b0014;
+          font-weight: 900;
+        }
 
-      <div class="setting-row">
-        <span>Música:</span>
-        <div
-          class="toggle active"
-          id="music-toggle"
-          onclick="togglePauseMusic()"
-        >
-          <div class="toggle-slider"></div>
-        </div>
+        #code-close {
+          background: #333;
+          color: #fff;
+        }
+
+        @media (max-width: 560px) {
+          #code-overlay .code-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* Jumpscare */
+        #jumpscare {
+          position: fixed;
+          inset: 0;
+          display: none;
+          z-index: 99999;
+          background: #000;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+        }
+        #jumpscare.on {
+          animation: flicker 0.15s infinite;
+        }
+        #jumpscare .face {
+          width: min(520px, 90vw);
+          height: min(520px, 60vh);
+          border-radius: 22px;
+          background: radial-gradient(
+              circle at 50% 40%,
+              rgba(255, 255, 255, 0.1),
+              rgba(0, 0, 0, 0.9)
+            ),
+            radial-gradient(
+              circle at 35% 40%,
+              rgba(255, 0, 0, 0.95),
+              rgba(0, 0, 0, 0) 55%
+            ),
+            radial-gradient(
+              circle at 65% 40%,
+              rgba(255, 0, 0, 0.95),
+              rgba(0, 0, 0, 0) 55%
+            ),
+            radial-gradient(
+              circle at 50% 70%,
+              rgba(255, 255, 255, 0.12),
+              rgba(0, 0, 0, 0) 60%
+            );
+          box-shadow: 0 0 50px rgba(255, 0, 0, 0.55);
+        }
+        #jumpscare-text {
+          margin-top: 18px;
+          color: #fff;
+          font-size: 34px;
+          font-weight: 900;
+          letter-spacing: 2px;
+          text-shadow: 0 0 18px rgba(255, 0, 0, 0.55);
+        }
+        @keyframes flicker {
+          0% {
+            filter: brightness(1);
+            transform: scale(1);
+          }
+          50% {
+            filter: brightness(1.35);
+            transform: scale(1.01);
+          }
+          100% {
+            filter: brightness(0.9);
+            transform: scale(1);
+          }
+        }
+      </style>
+    </head>
+
+    <body>
+      <div id="hud">
+        <div>Final: <span style="color: #d39bff">UV</span> + Terminal</div>
+        <div id="msg">Encontra a lanterna UV. Esta sala não perdoa.</div>
+        <div class="hud-hint">ESC pausa | U liga/desliga UV</div>
       </div>
 
-      <div class="setting-row">
-        <span>Volume:</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value="40"
-          id="volume-control"
-          oninput="updatePauseVolume(this.value)"
-        />
-        <span id="vol-display">40%</span>
+      <div id="timer-top" class="timer-top" aria-label="Tempo restante">
+        <span id="timer-text">00:00</span>
       </div>
 
-      <button class="menu-btn btn-red" onclick="resumeGame()">Continuar</button>
-      <button
-        class="menu-btn btn-red"
-        onclick="window.location.href='../index-simples.html'"
-      >
-        Menu Principal
-      </button>
-    </div>
+      <div id="pause-menu" class="theme-red">
+        <h2>JOGO PAUSADO</h2>
 
-    <!-- Overlay do terminal/código -->
-    <div id="code-overlay" aria-hidden="true">
-      <div class="panel">
-        <h2 style="color: #d39bff; margin: 0 0 8px 0">Terminal Final</h2>
-        <div style="opacity: 0.9">
-          Usa as inscrições UV: cada símbolo tem um dígito.
+        <div class="setting-row">
+          <span>Música:</span>
           <div
-            id="code-order-text"
-            style="margin-top: 6px; color: #f0dcff; font-size: 14px"
-          ></div>
-        </div>
-
-        <div class="code-grid">
-          <div class="code-slot">
-            <label for="term-slot-0">TRI</label>
-            <input
-              id="term-slot-0"
-              inputmode="numeric"
-              maxlength="1"
-              placeholder="0"
-            />
-          </div>
-
-          <div class="code-slot">
-            <label for="term-slot-1">X</label>
-            <input
-              id="term-slot-1"
-              inputmode="numeric"
-              maxlength="1"
-              placeholder="0"
-            />
-          </div>
-
-          <div class="code-slot">
-            <label for="term-slot-2">CIR</label>
-            <input
-              id="term-slot-2"
-              inputmode="numeric"
-              maxlength="1"
-              placeholder="0"
-            />
-          </div>
-
-          <div class="code-slot">
-            <label for="term-slot-3">SQR</label>
-            <input
-              id="term-slot-3"
-              inputmode="numeric"
-              maxlength="1"
-              placeholder="0"
-            />
+            class="toggle active"
+            id="music-toggle"
+            onclick="togglePauseMusic()"
+          >
+            <div class="toggle-slider"></div>
           </div>
         </div>
 
-        <div id="code-msg" style="margin-top: 10px; min-height: 22px"></div>
+        <div class="setting-row">
+          <span>Volume:</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="40"
+            id="volume-control"
+            oninput="updatePauseVolume(this.value)"
+          />
+          <span id="vol-display">40%</span>
+        </div>
 
-        <div class="actions">
-          <button id="code-confirm" type="button">Confirmar</button>
-          <button id="code-close" type="button">Fechar</button>
+        <button class="menu-btn btn-red" onclick="resumeGame()">Continuar</button>
+        <button
+          class="menu-btn btn-red"
+          onclick="window.location.href='../index-simples.html'"
+        >
+          Menu Principal
+        </button>
+      </div>
+
+      <!-- Overlay do terminal/código -->
+      <div id="code-overlay" aria-hidden="true">
+        <div class="panel">
+          <h2 style="color: #d39bff; margin: 0 0 8px 0">Terminal Final</h2>
+          <div style="opacity: 0.9">
+            Usa as inscrições UV: cada símbolo tem um dígito.
+            <div
+              id="code-order-text"
+              style="margin-top: 6px; color: #f0dcff; font-size: 14px"
+            ></div>
+          </div>
+
+          <div class="code-grid">
+            <div class="code-slot">
+              <label for="term-slot-0">TRI</label>
+              <input
+                id="term-slot-0"
+                inputmode="numeric"
+                maxlength="1"
+                placeholder="0"
+              />
+            </div>
+
+            <div class="code-slot">
+              <label for="term-slot-1">X</label>
+              <input
+                id="term-slot-1"
+                inputmode="numeric"
+                maxlength="1"
+                placeholder="0"
+              />
+            </div>
+
+            <div class="code-slot">
+              <label for="term-slot-2">CIR</label>
+              <input
+                id="term-slot-2"
+                inputmode="numeric"
+                maxlength="1"
+                placeholder="0"
+              />
+            </div>
+
+            <div class="code-slot">
+              <label for="term-slot-3">SQR</label>
+              <input
+                id="term-slot-3"
+                inputmode="numeric"
+                maxlength="1"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <div id="code-msg" style="margin-top: 10px; min-height: 22px"></div>
+
+          <div class="actions">
+            <button id="code-confirm" type="button">Confirmar</button>
+            <button id="code-close" type="button">Fechar</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Jumpscare -->
-    <div id="jumpscare">
-      <div class="face"></div>
-      <div id="jumpscare-text">...</div>
-    </div>
+      <!-- Jumpscare -->
+      <div id="jumpscare">
+        <div class="face"></div>
+        <div id="jumpscare-text">...</div>
+      </div>
 
-    <a-scene fog="type: exponential; color: #050103; density: 0.04">
-      <a-assets></a-assets>
-      <a-sky color="#030001"></a-sky>
+      <a-scene fog="type: exponential; color: #050103; density: 0.04">
+        <a-assets></a-assets>
+        <a-sky color="#030001"></a-sky>
 
-      <!-- Chão (raycastável para UV) -->
-      <a-plane
-        id="floor"
-        class="uv-ray"
-        position="0 0 0"
-        rotation="-90 0 0"
-        width="12"
-        height="12"
-        material="shader: standard; color: #1a1214; roughness: 1; metalness: 0"
-        nav-mesh
-      ></a-plane>
+        <!-- Chão (raycastável para UV) -->
+        <a-plane
+          id="floor"
+          class="uv-ray"
+          position="0 0 0"
+          rotation="-90 0 0"
+          width="12"
+          height="12"
+          material="shader: standard; color: #1a1214; roughness: 1; metalness: 0"
+          nav-mesh
+        ></a-plane>
 
-      <!-- Paredes (raycastáveis para UV) -->
-      <a-box
-        class="wall uv-ray"
-        position="0 2 -6"
-        width="12"
-        height="4"
-        depth="0.2"
-        material="shader: standard; color: #2b151a; roughness: 1"
-      ></a-box>
-
-      <a-box
-        class="wall uv-ray"
-        position="-6 2 0"
-        width="0.2"
-        height="4"
-        depth="12"
-        material="shader: standard; color: #2b151a; roughness: 1"
-      ></a-box>
-
-      <a-box
-        class="wall uv-ray"
-        position="6 2 0"
-        width="0.2"
-        height="4"
-        depth="12"
-        material="shader: standard; color: #2b151a; roughness: 1"
-      ></a-box>
-
-      <a-box
-        class="wall uv-ray"
-        position="0 2 6"
-        width="12"
-        height="4"
-        depth="0.2"
-        material="shader: standard; color: #2b151a; roughness: 1"
-      ></a-box>
-
-      <!-- Teto (raycastável para UV) -->
-      <a-plane
-        id="ceiling"
-        class="uv-ray"
-        position="0 4 0"
-        rotation="90 0 0"
-        width="12"
-        height="12"
-        material="shader: standard; color: #0f0a0b; roughness: 1"
-      ></a-plane>
-
-      <!-- Luz normal -->
-      <a-light
-        id="normal-light"
-        type="point"
-        position="0 3.3 1.2"
-        intensity="0.55"
-        color="#ffb3b3"
-        distance="18"
-      ></a-light>
-      <a-light type="ambient" intensity="0.10" color="#1a0b0e"></a-light>
-
-      <!-- Gaveta com lanterna UV -->
-      <a-entity position="-4.6 0 -3.6" rotation="0 35 0">
+        <!-- Paredes (raycastáveis para UV) -->
         <a-box
-          width="1.5"
-          height="1.1"
-          depth="0.55"
-          material="shader: standard; color:#3b2118; roughness:0.95"
+          class="wall uv-ray"
+          position="0 2 -6"
+          width="12"
+          height="4"
+          depth="0.2"
+          material="shader: standard; color: #2b151a; roughness: 1"
         ></a-box>
 
         <a-box
-          id="uv-drawer"
+          class="wall uv-ray"
+          position="-6 2 0"
+          width="0.2"
+          height="4"
+          depth="12"
+          material="shader: standard; color: #2b151a; roughness: 1"
+        ></a-box>
+
+        <a-box
+          class="wall uv-ray"
+          position="6 2 0"
+          width="0.2"
+          height="4"
+          depth="12"
+          material="shader: standard; color: #2b151a; roughness: 1"
+        ></a-box>
+
+        <a-box
+          class="wall uv-ray"
+          position="0 2 6"
+          width="12"
+          height="4"
+          depth="0.2"
+          material="shader: standard; color: #2b151a; roughness: 1"
+        ></a-box>
+
+        <!-- Teto (raycastável para UV) -->
+        <a-plane
+          id="ceiling"
+          class="uv-ray"
+          position="0 4 0"
+          rotation="90 0 0"
+          width="12"
+          height="12"
+          material="shader: standard; color: #0f0a0b; roughness: 1"
+        ></a-plane>
+
+        <!-- Luz normal -->
+        <a-light
+          id="normal-light"
+          type="point"
+          position="0 3.3 1.2"
+          intensity="0.55"
+          color="#ffb3b3"
+          distance="18"
+        ></a-light>
+        <a-light type="ambient" intensity="0.10" color="#1a0b0e"></a-light>
+
+        <!-- Gaveta com lanterna UV -->
+        <a-entity position="-4.6 0 -3.6" rotation="0 35 0">
+          <a-box
+            width="1.5"
+            height="1.1"
+            depth="0.55"
+            material="shader: standard; color:#3b2118; roughness:0.95"
+          ></a-box>
+
+          <a-box
+            id="uv-drawer"
+            class="interactable"
+            position="0 0.65 0.2"
+            width="1.1"
+            height="0.22"
+            depth="0.16"
+            material="shader: standard; color:#26130e; roughness:0.95"
+          ></a-box>
+
+          <a-box
+            id="uv-flashlight"
+            class="interactable"
+            visible="false"
+            position="0.18 0.72 0.12"
+            width="0.28"
+            height="0.08"
+            depth="0.14"
+            material="shader: standard; color:#bfbfbf; metalness:0.75; roughness:0.25"
+          ></a-box>
+        </a-entity>
+
+        <!-- Pedestal -->
+        <a-cylinder
+          id="uv-pedestal"
           class="interactable"
-          position="0 0.65 0.2"
-          width="1.1"
-          height="0.22"
-          depth="0.16"
-          material="shader: standard; color:#26130e; roughness:0.95"
-        ></a-box>
-
-        <a-box
-          id="uv-flashlight"
-          class="interactable"
-          visible="false"
-          position="0.18 0.72 0.12"
-          width="0.28"
-          height="0.08"
-          depth="0.14"
-          material="shader: standard; color:#bfbfbf; metalness:0.75; roughness:0.25"
-        ></a-box>
-      </a-entity>
-
-      <!-- Pedestal -->
-      <a-cylinder
-        id="uv-pedestal"
-        class="interactable"
-        position="4.6 0.35 -3.8"
-        radius="0.25"
-        height="0.7"
-        material="shader: standard; color:#1c1c1c; roughness:0.95"
-      ></a-cylinder>
-      <a-text
-        value="UV"
-        position="4.6 1.05 -3.7"
-        align="center"
-        color="#d39bff"
-        width="3"
-      ></a-text>
-
-      <!-- Textos UV (todos consistentes: class uv-clue, visible false, opacity 0) -->
-      <a-text
-        id="uv-TRI"
-        class="uv-clue"
-        position="-5.6 2.8 0"
-        rotation="0 90 0"
-        value="TRI:?"
-        color="#d39bff"
-        width="6"
-        visible="false"
-        material="transparent: true; opacity: 0"
-      ></a-text>
-
-      <a-text
-        id="uv-CIR"
-        class="uv-clue"
-        position="5.6 2.4 1.0"
-        rotation="0 -90 0"
-        value="CIR:?"
-        color="#d39bff"
-        width="6"
-        visible="false"
-        material="transparent: true; opacity: 0"
-      ></a-text>
-
-      <a-text
-        id="uv-SQR"
-        class="uv-clue"
-        position="0 2.3 -5.6"
-        rotation="0 0 0"
-        value="SQR:?"
-        color="#d39bff"
-        width="6"
-        visible="false"
-        material="transparent: true; opacity: 0"
-      ></a-text>
-
-      <a-text
-        id="uv-X"
-        class="uv-clue"
-        position="0 1.9 5.6"
-        rotation="0 180 0"
-        value="X:?"
-        color="#d39bff"
-        width="6"
-        visible="false"
-        material="transparent: true; opacity: 0"
-      ></a-text>
-
-      <!-- Terminal -->
-      <a-box
-        id="terminal"
-        class="interactable"
-        position="0 1.2 -5.15"
-        width="1.8"
-        height="1.8"
-        depth="0.35"
-        material="shader: standard; color:#0f0f0f; roughness:0.95; metalness:0.1"
-      >
+          position="4.6 0.35 -3.8"
+          radius="0.25"
+          height="0.7"
+          material="shader: standard; color:#1c1c1c; roughness:0.95"
+        ></a-cylinder>
         <a-text
-          value="TERMINAL"
-          position="0 0.55 0.2"
+          value="UV"
+          position="4.6 1.05 -3.7"
           align="center"
           color="#d39bff"
           width="3"
         ></a-text>
+
+        <!-- Textos UV (todos consistentes: class uv-clue, visible false, opacity 0) -->
         <a-text
-          value="CLICA"
-          position="0 0.25 0.2"
-          align="center"
-          color="#ffffff"
-          width="3"
+          id="uv-TRI"
+          class="uv-clue"
+          position="-5.6 2.8 0"
+          rotation="0 90 0"
+          value="TRI:?"
+          color="#d39bff"
+          width="6"
+          visible="false"
+          material="transparent: true; opacity: 0"
         ></a-text>
-      </a-box>
 
-      <!-- Porta final -->
-      <a-entity id="doorframe" position="0 1.59 5.9" rotation="0 180 0">
-        <a-box
-          position="0 0 0.06"
-          width="2.18"
-          height="3.18"
-          depth="0.08"
-          material="shader: standard; color:#3b2118; roughness:0.9"
-        ></a-box>
-      </a-entity>
+        <a-text
+          id="uv-CIR"
+          class="uv-clue"
+          position="5.6 2.4 1.0"
+          rotation="0 -90 0"
+          value="CIR:?"
+          color="#d39bff"
+          width="6"
+          visible="false"
+          material="transparent: true; opacity: 0"
+        ></a-text>
 
-      <a-entity id="doorPivot" position="-1 1.59 5.9" rotation="0 180 0">
+        <a-text
+          id="uv-SQR"
+          class="uv-clue"
+          position="0 2.3 -5.6"
+          rotation="0 0 0"
+          value="SQR:?"
+          color="#d39bff"
+          width="6"
+          visible="false"
+          material="transparent: true; opacity: 0"
+        ></a-text>
+
+        <a-text
+          id="uv-X"
+          class="uv-clue"
+          position="0 1.9 5.6"
+          rotation="0 180 0"
+          value="X:?"
+          color="#d39bff"
+          width="6"
+          visible="false"
+          material="transparent: true; opacity: 0"
+        ></a-text>
+
+        <!-- Terminal -->
         <a-box
-          id="door"
+          id="terminal"
           class="interactable"
-          position="1 0 0"
-          width="2"
-          height="3"
-          depth="0.22"
-          material="opacity: 0; transparent: true"
-        ></a-box>
-
-        <a-box
-          position="1 0 0.1"
-          width="1.92"
-          height="2.92"
-          depth="0.1"
-          material="shader: standard; color:#2a1411; roughness:0.9"
-        ></a-box>
-
-        <a-sphere
-          position="1.78 0.05 0.18"
-          radius="0.09"
-          material="shader: standard; color:#b9b9b9; metalness:0.9; roughness:0.3"
-        ></a-sphere>
-      </a-entity>
-
-      <!-- Rig -->
-      <a-entity
-        id="rig"
-        position="0 0 -3"
-        clamp-bounds="minX: -5.8; maxX: 5.8; minZ: -5.8; maxZ: 5.8; margin: 0.05"
-        movement-controls="speed: 0.32; fly: false; constrainToNavMesh: true"
-      >
-        <a-camera
-          id="player-camera"
-          position="0 1.6 0"
-          wasd-controls="enabled: false"
-          look-controls="pointerLockEnabled: false"
+          position="0 1.2 -5.15"
+          width="1.8"
+          height="1.8"
+          depth="0.35"
+          material="shader: standard; color:#0f0f0f; roughness:0.95; metalness:0.1"
         >
-          <!-- UV spotlight (mais forte e com alcance) -->
-          <a-light
-            id="uv-spot"
-            type="spot"
-            color="#b86bff"
-            intensity="0"
-            angle="12"
-            penumbra="0.25"
-            distance="10"
-            decay="0.6"
-            position="0 0 -0.05"
-          ></a-light>
+          <a-text
+            value="TERMINAL"
+            position="0 0.55 0.2"
+            align="center"
+            color="#d39bff"
+            width="3"
+          ></a-text>
+          <a-text
+            value="CLICA"
+            position="0 0.25 0.2"
+            align="center"
+            color="#ffffff"
+            width="3"
+          ></a-text>
+        </a-box>
 
-          <a-cursor
-            color="#ff0000"
-            fuse="true"
-            fuse-timeout="800"
-            raycaster="objects: .interactable, .uv-ray; far: 6 "
-          ></a-cursor>
-        </a-camera>
-      </a-entity>
-    </a-scene>
+        <!-- Porta final -->
+        <a-entity id="doorframe" position="0 1.59 5.9" rotation="0 180 0">
+          <a-box
+            position="0 0 0.06"
+            width="2.18"
+            height="3.18"
+            depth="0.08"
+            material="shader: standard; color:#3b2118; roughness:0.9"
+          ></a-box>
+        </a-entity>
 
-    <!-- Áudios -->
-    <audio id="bg-music" loop preload="auto">
-      <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
-    </audio>
+        <a-entity id="doorPivot" position="-1 1.59 5.9" rotation="0 180 0">
+          <a-box
+            id="door"
+            class="interactable"
+            position="1 0 0"
+            width="2"
+            height="3"
+            depth="0.22"
+            material="opacity: 0; transparent: true"
+          ></a-box>
 
-    <audio id="sfx-door-open" preload="auto">
-      <source src="../assets/sounds/door-opening.mp3" type="audio/mpeg" />
-    </audio>
-    <audio id="sfx-door-locked" preload="auto">
-      <source src="../assets/sounds/door-locked.mp3" type="audio/mpeg" />
-    </audio>
-    <audio id="sfx-drawer-open" preload="auto">
-      <source src="../assets/sounds/drawer-open.mp3" type="audio/mpeg" />
-    </audio>
-    <audio id="sfx-find-lighter" preload="auto">
-      <source src="../assets/sounds/find-lighter.mp3" type="audio/mpeg" />
-    </audio>
-    <audio id="sfx-hmm-reflexion" preload="auto">
-      <source src="../assets/sounds/hmm-reflexion.mp3" type="audio/mpeg" />
-    </audio>
-    <audio id="sfx-wakeup" preload="auto">
-      <source src="../assets/sounds/man-waking-up.mp3" type="audio/mpeg" />
-    </audio>
-    <audio id="sfx-keys" preload="auto">
-      <source src="../assets/sounds/keys.mp3" type="audio/mpeg" />
-    </audio>
+          <a-box
+            position="1 0 0.1"
+            width="1.92"
+            height="2.92"
+            depth="0.1"
+            material="shader: standard; color:#2a1411; roughness:0.9"
+          ></a-box>
 
-    <!-- Script do nível -->
-    <script src="../assets/scripts/levels/level4.js?v=2"></script>
-  </body>
-</html>
+          <a-sphere
+            position="1.78 0.05 0.18"
+            radius="0.09"
+            material="shader: standard; color:#b9b9b9; metalness:0.9; roughness:0.3"
+          ></a-sphere>
+        </a-entity>
+
+        <!-- Rig -->
+        <a-entity
+          id="rig"
+          position="0 0 -3"
+          clamp-bounds="minX: -5.8; maxX: 5.8; minZ: -5.8; maxZ: 5.8; margin: 0.05"
+          movement-controls="speed: 0.32; fly: false; constrainToNavMesh: true"
+        >
+          <a-camera
+            id="player-camera"
+            position="0 1.6 0"
+            wasd-controls="enabled: false"
+            look-controls="pointerLockEnabled: false"
+          >
+            <!-- UV spotlight (mais forte e com alcance) -->
+            <a-light
+              id="uv-spot"
+              type="spot"
+              color="#b86bff"
+              intensity="0"
+              angle="12"
+              penumbra="0.25"
+              distance="10"
+              decay="0.6"
+              position="0 0 -0.05"
+            ></a-light>
+
+            <a-cursor
+              color="#ff0000"
+              fuse="true"
+              fuse-timeout="800"
+              raycaster="objects: .interactable, .uv-ray; far: 6 "
+            ></a-cursor>
+          </a-camera>
+        </a-entity>
+      </a-scene>
+
+      <!-- Áudios -->
+      <audio id="bg-music" loop preload="auto">
+        <source src="../assets/sounds/musica-ambiente.mp3" type="audio/mpeg" />
+      </audio>
+
+      <audio id="sfx-door-open" preload="auto">
+        <source src="../assets/sounds/door-opening.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="sfx-door-locked" preload="auto">
+        <source src="../assets/sounds/door-locked.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="sfx-drawer-open" preload="auto">
+        <source src="../assets/sounds/drawer-open.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="sfx-find-lighter" preload="auto">
+        <source src="../assets/sounds/find-lighter.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="sfx-hmm-reflexion" preload="auto">
+        <source src="../assets/sounds/hmm-reflexion.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="sfx-wakeup" preload="auto">
+        <source src="../assets/sounds/man-waking-up.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="sfx-keys" preload="auto">
+        <source src="../assets/sounds/keys.mp3" type="audio/mpeg" />
+      </audio>
+
+      <!-- Script do nível -->
+      <script src="../assets/scripts/levels/level4.js?v=2"></script>
+    </body>
+  </html>
