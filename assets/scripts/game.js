@@ -4,9 +4,9 @@ const GAME_KEYS = {
 };
 
 function getUnlockedLevel() {
-  const raw = localStorage.getItem(GAME_KEYS.unlockedLevel);
-  const n = parseInt(raw || "1", 10);
-  return Number.isNaN(n) ? 1 : n;
+  const storedValue = localStorage.getItem(GAME_KEYS.unlockedLevel);
+  const parsedLevel = parseInt(storedValue || "1", 10);
+  return Number.isNaN(parsedLevel) ? 1 : parsedLevel;
 }
 
 function setUnlockedLevel(level) {
@@ -14,8 +14,8 @@ function setUnlockedLevel(level) {
 }
 
 function unlockLevel(level) {
-  const current = getUnlockedLevel();
-  if (level > current) setUnlockedLevel(level);
+  const currentUnlockedLevel = getUnlockedLevel();
+  if (level > currentUnlockedLevel) setUnlockedLevel(level);
 }
 
 function isUnlockedLevel(level) {
@@ -28,11 +28,11 @@ function resetProgress() {
 
 // ===== Guard (protege páginas) =====
 function requireUnlockedLevel(requiredLevel, redirectPath) {
-  const unlocked = getUnlockedLevel();
-  if (unlocked < requiredLevel) window.location.href = redirectPath;
+  const currentUnlockedLevel = getUnlockedLevel();
+  if (currentUnlockedLevel < requiredLevel) window.location.href = redirectPath;
 }
 
-// expor no window para poderes chamar no HTML
+// Expor no window para chamar no HTML
 window.getUnlockedLevel = getUnlockedLevel;
 window.setUnlockedLevel = setUnlockedLevel;
 window.unlockLevel = unlockLevel;

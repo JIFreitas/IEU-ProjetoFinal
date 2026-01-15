@@ -61,18 +61,18 @@
 
     <div class="container">
       <h1>ESCAPE ROOM</h1>
-      <p>Bem-vindo à Casa Assombrada. Complete os 3 níveis para escapar!</p>
+      <p>Bem-vindo à Casa Assombrada. Conclui os 3 níveis para escapar!</p>
 
       <div class="info">
         <h3>COMO JOGAR</h3>
         <ul>
           <li><strong>WASD</strong> - Mover</li>
-          <li><strong>Mouse</strong> - Olhar ao redor</li>
+          <li><strong>Mouse</strong> - Olhar em redor</li>
           <li>
-            <strong>Cursor vermelho</strong> - Olhe para objetos brilhantes
+            <strong>Cursor vermelho</strong> - Olha para objetos brilhantes
           </li>
           <li>
-            <strong>Clique automático</strong> - Mantenha cursor sobre objeto
+            <strong>Clique automático</strong> - Mantém o cursor sobre o objeto
           </li>
           <li><strong>ESC</strong> - Menu de pausa (durante o jogo)</li>
         </ul>
@@ -86,7 +86,7 @@
           data-level="1"
         >
           <span class="level-title">NÍVEL 1 - Entrada</span><br />
-          <small class="level-sub">Encontre 3 chaves</small>
+          <small class="level-sub">Encontra 3 chaves</small>
         </a>
 
         <a
@@ -97,7 +97,7 @@
         >
           <span class="lock-badge" aria-hidden="true">🔒</span>
           <span class="level-title">NÍVEL 2 - Corredor</span><br />
-          <small class="level-sub">Acenda 4 velas na ordem</small>
+          <small class="level-sub">Acende 4 velas pela ordem</small>
         </a>
 
         <a
@@ -108,7 +108,7 @@
         >
           <span class="lock-badge" aria-hidden="true">🔒</span>
           <span class="level-title">NÍVEL 3 - Sala Final</span><br />
-          <small class="level-sub">Descubra o código secreto</small>
+          <small class="level-sub">Descobre o código secreto</small>
         </a>
 
         <a
@@ -119,11 +119,11 @@
         >
           <span class="lock-badge" aria-hidden="true">🔒</span>
           <span class="level-title">NÍVEL 4 - Final (UV)</span><br />
-          <small class="level-sub">UV + Terminal (Boss)</small>
+          <small class="level-sub">UV + Terminal</small>
         </a>
       </div>
 
-      <!-- Aviso (toast) quando clicas em nível bloqueado -->
+      <!-- Aviso (toast) quando se clica em nível bloqueado -->
       <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </div>
 
@@ -133,11 +133,13 @@
         const enabled = getMusicEnabled();
         const vol = getMusicVolume();
 
-        document
-          .getElementById("music-toggle")
-          .classList.toggle("active", enabled);
-        document.getElementById("volume-slider").value = String(vol);
-        document.getElementById("volume-value").textContent = `${vol}%`;
+        const musicToggle = document.getElementById("music-toggle");
+        const volumeSlider = document.getElementById("volume-slider");
+        const volumeValue = document.getElementById("volume-value");
+
+        musicToggle?.classList.toggle("active", enabled);
+        if (volumeSlider) volumeSlider.value = String(vol);
+        if (volumeValue) volumeValue.textContent = `${vol}%`;
       }
 
       // ===== Funções do overlay (UI) =====
@@ -145,8 +147,8 @@
         document.getElementById("settings-overlay").classList.toggle("active");
       }
 
-      function closeSettingsIfOverlay(event) {
-        if (event.target.id === "settings-overlay") toggleSettings();
+      function closeSettingsIfOverlay(evt) {
+        if (evt.target.id === "settings-overlay") toggleSettings();
       }
 
       // ===== Funções do index que gravam settings (via common.js) =====
@@ -156,15 +158,17 @@
       }
 
       function updateVolume(value) {
-        const v = parseInt(value, 10);
-        if (Number.isNaN(v)) return;
+        const vol = parseInt(value, 10);
+        if (Number.isNaN(vol)) return;
 
-        setMusicVolume(v);
-        document.getElementById("volume-value").textContent = `${v}%`;
+        setMusicVolume(vol);
+
+        const volumeValue = document.getElementById("volume-value");
+        if (volumeValue) volumeValue.textContent = `${vol}%`;
       }
 
       // ===== Toast =====
-      let toastTimer = null;
+      let toastTimeoutId = null;
 
       function showToast(message) {
         const toast = document.getElementById("toast");
@@ -173,19 +177,19 @@
         toast.textContent = message;
         toast.classList.add("show");
 
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => {
+        clearTimeout(toastTimeoutId);
+        toastTimeoutId = setTimeout(() => {
           toast.classList.remove("show");
         }, 2200);
       }
 
-      function preventLockedClick(e) {
-        e.preventDefault();
+      function preventLockedClick(evt) {
+        evt.preventDefault();
 
-        const a = e.currentTarget;
+        const a = evt.currentTarget;
         const level = a?.getAttribute("data-level") || "?";
         showToast(
-          `🔒 O Nível ${level} ainda está bloqueado. Termina o nível anterior para o desbloquear.`
+          `🔒 O Nível ${level} ainda está bloqueado. Conclui o nível anterior para o desbloqueares.`
         );
       }
 

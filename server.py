@@ -1,15 +1,16 @@
-#!/usr/bin/env python3
 import http.server
 import socketserver
 
-PORT = 8000
+SERVER_PORT = 8000
 
-Handler = http.server.SimpleHTTPRequestHandler
-Handler.extensions_map.update({
-    '.js': 'application/javascript',
-})
+request_handler_cls = http.server.SimpleHTTPRequestHandler
+request_handler_cls.extensions_map.update(
+    {
+        ".js": "application/javascript",
+    }
+)
 
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print(f"Servidor rodando em http://localhost:{PORT}")
-    print(f"Abra: http://localhost:{PORT}/index-simples.html")
-    httpd.serve_forever()
+with socketserver.TCPServer(("", SERVER_PORT), request_handler_cls) as server:
+    print(f"Servidor a rodar em http://localhost:{SERVER_PORT}")
+    print(f"Abra: http://localhost:{SERVER_PORT}/index-simples.html")
+    server.serve_forever()

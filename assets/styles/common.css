@@ -1,5 +1,7 @@
 /* ========= Base ========= */
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -99,12 +101,15 @@ body {
   0% {
     transform: translateY(-100%);
   }
+
   18% {
     transform: translateY(0%);
   }
+
   45% {
     transform: translateY(0%);
   }
+
   100% {
     transform: translateY(-100%);
   }
@@ -114,12 +119,15 @@ body {
   0% {
     transform: translateY(100%);
   }
+
   18% {
     transform: translateY(0%);
   }
+
   45% {
     transform: translateY(0%);
   }
+
   100% {
     transform: translateY(100%);
   }
@@ -130,17 +138,21 @@ body {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.98);
   }
+
   40% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.99);
   }
+
   55% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
+
   85% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
@@ -188,7 +200,7 @@ body {
   color: #ff0000;
 }
 
-/* Variações de tema por nível (opcional) */
+/* Variações de tema por nível */
 #pause-menu.theme-red {
   border-color: #ff0000;
   box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
@@ -235,7 +247,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Variações de cor (usa classes no HTML se quiseres) */
+/* Variações de cor */
 .btn-red {
   background: #330000;
   border-color: #ff0000;
@@ -330,18 +342,14 @@ input[type="range"] {
   top: 16px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-
   z-index: 999999 !important;
   pointer-events: none !important;
-
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-
   width: auto !important;
   padding: 6px 14px !important;
   border-radius: 10px !important;
-
   background: rgba(0, 0, 0, 0.35) !important;
   backdrop-filter: blur(2px);
 }
@@ -363,15 +371,6 @@ input[type="range"] {
 }
 
 /* ========= TERMINAL FINAL (NÍVEL 4) ========= */
-/* COLA AQUI O CSS DO TERMINAL FINAL */
-
-/* ✅ Impede “fugas” de largura em inputs + padding/border */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 #terminal-overlay {
   position: fixed;
   inset: 0;
@@ -380,20 +379,20 @@ input[type="range"] {
   background: rgba(0, 0, 0, 0.6);
   align-items: center;
   justify-content: center;
-  padding: 18px; /* ✅ dá margem no mobile */
+  padding: 18px;
 }
 
 #terminal-overlay .panel {
   width: min(720px, calc(100vw - 36px));
   background: rgba(0, 0, 0, 0.95);
-  border: 2px solid rgba(160, 90, 255, 0.45); /* tom roxo */
+  border: 2px solid rgba(160, 90, 255, 0.45);
   border-radius: 16px;
   padding: 18px 18px 16px;
   color: #e8e8e8;
-  overflow: hidden; /* ✅ corta qualquer coisa que tente sair */
+  overflow: hidden;
 }
 
-/* ✅ Grid dos 4 dígitos */
+/* Grid dos 4 dígitos */
 .code-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -402,7 +401,7 @@ input[type="range"] {
   align-items: end;
 }
 
-/* ✅ Cada slot: label em cima e input centrado */
+/* Cada slot: label em cima e input centrado */
 .code-slot label {
   display: block;
   font-size: 12px;
@@ -413,7 +412,7 @@ input[type="range"] {
 
 .code-slot input {
   width: 100%;
-  min-width: 0;              /* ✅ MUITO IMPORTANTE em grid/flex */
+  min-width: 0;
   font-size: 28px;
   text-align: center;
   padding: 12px 10px;
@@ -428,12 +427,12 @@ input[type="range"] {
   border-color: rgba(200, 140, 255, 0.9);
 }
 
-/* ✅ Botões */
+/* Botões */
 #terminal-overlay .actions {
   display: flex;
   gap: 10px;
   margin-top: 14px;
-  flex-wrap: wrap; /* ✅ no mobile não rebenta */
+  flex-wrap: wrap;
 }
 
 #terminal-overlay button {
@@ -445,7 +444,7 @@ input[type="range"] {
 }
 
 #terminal-confirm {
-  background: #a05aff; /* roxo */
+  background: #a05aff;
   color: #0b0014;
   font-weight: 700;
 }
@@ -455,7 +454,7 @@ input[type="range"] {
   color: #fff;
 }
 
-/* ✅ Responsivo: 2 colunas no telemóvel */
+/* Responsivo: 2 colunas no telemóvel */
 @media (max-width: 560px) {
   .code-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

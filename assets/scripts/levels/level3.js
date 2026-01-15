@@ -1,9 +1,8 @@
 window.addEventListener("DOMContentLoaded", () => {
   requireUnlockedLevel(3, "../index-simples.html");
 
-  // --- Estado ---
   let solved = false;
-  let terminalOrder = ["red", "blue", "green", "yellow"]; // vai ser randomizado
+  let terminalOrder = ["red", "blue", "green", "yellow"];
 
   const COLOR_META = {
     red: { name: "Vermelho", hex: "#c0392b" },
@@ -12,7 +11,6 @@ window.addEventListener("DOMContentLoaded", () => {
     yellow: { name: "Amarelo", hex: "#f1c40f" },
   };
 
-  // --- UI ---
   const msgDiv = document.getElementById("msg");
   const terminalStateSpan = document.getElementById("terminal-state");
   const terminalStatusText = document.getElementById("terminal-status-text");
@@ -25,18 +23,12 @@ window.addEventListener("DOMContentLoaded", () => {
   const doorTextEl = document.getElementById("door-text");
   const doorTextBgEl = document.getElementById("door-text-bg");
 
-  startLevelTimer({
-    seconds: 150,
-    onTimeout: () => {
-      msgDiv.textContent = "⏰ Tempo esgotado! A recomeçar o nível...";
-      msgDiv.style.color = "#ff0000";
-      setTimeout(() => location.reload(), 1500);
-    },
-  });
-
   function setMsg(text, color = "white", ms = 0, resetText = "") {
+    if (!msgDiv) return;
+
     msgDiv.textContent = text;
     msgDiv.style.color = color;
+
     if (ms > 0) {
       setTimeout(() => {
         msgDiv.textContent = resetText || msgDiv.textContent;
@@ -45,25 +37,35 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  startLevelTimer({
+    seconds: 150,
+    onTimeout: () => {
+      setMsg("⏰ Tempo esgotado! A recomeçar o nível...", "#ff0000");
+      setTimeout(() => location.reload(), 1500);
+    },
+  });
+
   function playSfx(id, volume = 0.75) {
     const el = document.getElementById(id);
     if (!el) return;
+
     try {
       el.pause();
       el.currentTime = 0;
       el.volume = volume;
       el.play();
     } catch {
-      // ignore autoplay restrictions
+      // Ignorar restrições de autoplay.
     }
   }
 
   function showDoorLockedText() {
-    if (doorTextEl) doorTextEl.setAttribute("visible", "true");
-    if (doorTextBgEl) doorTextBgEl.setAttribute("visible", "true");
+    doorTextEl?.setAttribute("visible", "true");
+    doorTextBgEl?.setAttribute("visible", "true");
+
     setTimeout(() => {
-      if (doorTextEl) doorTextEl.setAttribute("visible", "false");
-      if (doorTextBgEl) doorTextBgEl.setAttribute("visible", "false");
+      doorTextEl?.setAttribute("visible", "false");
+      doorTextBgEl?.setAttribute("visible", "false");
     }, 1400);
   }
 
@@ -75,6 +77,10 @@ window.addEventListener("DOMContentLoaded", () => {
     return arr;
   }
 
+  /**
+   * A ordem do terminal é aleatória por nível.
+   * Os slots (esq → dir) correspondem a esta ordem.
+   */
   function initTerminalOrder() {
     terminalOrder = shuffleInPlace(["red", "blue", "green", "yellow"]);
 
@@ -106,17 +112,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function openTerminal() {
     if (!terminalOverlay) return;
+
     terminalOverlay.style.display = "flex";
     terminalOverlay.setAttribute("aria-hidden", "false");
     if (terminalMsg) terminalMsg.textContent = "";
+
     setMsg(
       "⌨️ Insere as contagens por cor.",
       "#00ff00",
       1200,
       "Conta os objetos por cor e insere no terminal (esq → dir)."
     );
-    const first = document.getElementById("term-slot-0");
-    if (first) first.focus();
+
+    document.getElementById("term-slot-0")?.focus();
   }
 
   function closeTerminal() {
@@ -128,6 +136,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function parseNum(id) {
     const v = (document.getElementById(id)?.value || "").trim();
     if (!v) return null;
+
     const n = parseInt(v, 10);
     return Number.isNaN(n) ? null : n;
   }
@@ -153,9 +162,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (missingSlots.length > 0) {
       playSfx("sfx-hmm-reflexion", 0.7);
-      if (terminalMsg) terminalMsg.style.color = "#ffdddd";
-      if (terminalMsg)
+      if (terminalMsg) {
+        terminalMsg.style.color = "#ffdddd";
         terminalMsg.textContent = "Preenche todas as cores com números.";
+      }
       return false;
     }
 
@@ -166,9 +176,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (!ok) {
       playSfx("sfx-hmm-reflexion", 0.7);
-      if (terminalMsg) terminalMsg.style.color = "#ff4444";
-      if (terminalMsg)
+      if (terminalMsg) {
+        terminalMsg.style.color = "#ff4444";
         terminalMsg.textContent = "✗ Errado. Volta a contar com calma.";
+      }
+
       setMsg(
         "❌ Código errado. Tenta novamente.",
         "#ff4444",
@@ -178,39 +190,42 @@ window.addEventListener("DOMContentLoaded", () => {
       return false;
     }
 
-    // sucesso
     solved = true;
-
     unlockLevel(4);
 
-    if (terminalMsg) terminalMsg.style.color = "#00ff00";
-    if (terminalMsg)
+    if (terminalMsg) {
+      terminalMsg.style.color = "#00ff00";
       terminalMsg.textContent = "✓ Acesso concedido! Porta destrancada.";
+    }
+
     if (terminalStateSpan) terminalStateSpan.textContent = "DESTRANCADO";
     if (terminalStatusText) {
       terminalStatusText.setAttribute("value", "TERMINAL\n[OK]");
       terminalStatusText.setAttribute("color", "#ffff00");
     }
-    const door = document.getElementById("door");
-    if (door) door.classList.add("unlocked");
+
+    document.getElementById("door")?.classList.add("unlocked");
     setMsg("✅ Porta destrancada! Vai à porta.", "#00ff00");
     return true;
   }
 
-  // Texturas procedurais (simples, no mesmo estilo do nível 2)
   function rand(seed) {
     const x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
   }
 
+  // Texturas procedurais (mantidas no próprio nível, sem dependências externas)
   function drawWallTexture() {
     const canvas = document.getElementById("tex-wall");
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
-    const w = canvas.width,
-      h = canvas.height;
+    const w = canvas.width;
+    const h = canvas.height;
+
     ctx.fillStyle = "#6a5a4c";
     ctx.fillRect(0, 0, w, h);
+
     for (let i = 0; i < 8000; i++) {
       const x = (rand(i * 13.37) * w) | 0;
       const y = (rand(i * 99.11) * h) | 0;
@@ -223,11 +238,14 @@ window.addEventListener("DOMContentLoaded", () => {
   function drawCeilingTexture() {
     const canvas = document.getElementById("tex-ceiling");
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
-    const w = canvas.width,
-      h = canvas.height;
+    const w = canvas.width;
+    const h = canvas.height;
+
     ctx.fillStyle = "#1a1a1a";
     ctx.fillRect(0, 0, w, h);
+
     for (let i = 0; i < 9000; i++) {
       const x = (rand(i * 5.17) * w) | 0;
       const y = (rand(i * 71.9) * h) | 0;
@@ -240,17 +258,22 @@ window.addEventListener("DOMContentLoaded", () => {
   function drawWoodTexture() {
     const canvas = document.getElementById("tex-wood");
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
-    const w = canvas.width,
-      h = canvas.height;
+    const w = canvas.width;
+    const h = canvas.height;
+
     ctx.fillStyle = "#6a3a1d";
     ctx.fillRect(0, 0, w, h);
+
     const plankCount = 6;
     const plankW = w / plankCount;
+
     for (let p = 0; p < plankCount; p++) {
       const x0 = p * plankW;
       ctx.fillStyle = `rgba(0,0,0,${0.08 + rand(p * 2.1) * 0.06})`;
       ctx.fillRect(x0, 0, 2, h);
+
       for (let y = 0; y < h; y++) {
         const wobble = (Math.sin(y * 0.06 + p) + Math.sin(y * 0.013)) * 0.5;
         ctx.fillStyle = `rgba(0,0,0,${0.02 + Math.max(0, wobble) * 0.02})`;
@@ -262,11 +285,14 @@ window.addEventListener("DOMContentLoaded", () => {
   function drawFloorTexture() {
     const canvas = document.getElementById("tex-floor");
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
-    const w = canvas.width,
-      h = canvas.height;
+    const w = canvas.width;
+    const h = canvas.height;
+
     ctx.fillStyle = "#2f2a24";
     ctx.fillRect(0, 0, w, h);
+
     const tile = 64;
     for (let y = 0; y < h; y += tile) {
       for (let x = 0; x < w; x += tile) {
@@ -276,14 +302,17 @@ window.addEventListener("DOMContentLoaded", () => {
         ctx.fillRect(x, y, tile, tile);
       }
     }
+
     ctx.strokeStyle = "rgba(0,0,0,0.35)";
     ctx.lineWidth = 2;
+
     for (let i = 0; i <= w; i += tile) {
       ctx.beginPath();
       ctx.moveTo(i + 0.5, 0);
       ctx.lineTo(i + 0.5, h);
       ctx.stroke();
     }
+
     for (let i = 0; i <= h; i += tile) {
       ctx.beginPath();
       ctx.moveTo(0, i + 0.5);
@@ -314,26 +343,22 @@ window.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-    document.querySelectorAll(".wall").forEach((w) => {
-      w.setAttribute(
+    document.querySelectorAll(".wall").forEach((wallEl) => {
+      wallEl.setAttribute(
         "material",
         "shader: standard; src: #tex-wall; repeat: 6 2; roughness: 1; metalness: 0; color: #c9c2b8"
       );
     });
   }
 
-  // --- Terminal (abre overlay) ---
   if (!AFRAME.components["terminal-system-level3-colors"]) {
     AFRAME.registerComponent("terminal-system-level3-colors", {
       init: function () {
-        this.el.addEventListener("click", () => {
-          openTerminal();
-        });
+        this.el.addEventListener("click", openTerminal);
       },
     });
   }
 
-  // --- Porta (mesma lógica do nível 1/2: trancada até resolver) ---
   if (!AFRAME.components["door-system-level3"]) {
     AFRAME.registerComponent("door-system-level3", {
       init: function () {
@@ -351,6 +376,7 @@ window.addEventListener("DOMContentLoaded", () => {
           }
 
           playSfx("sfx-door-open", 0.75);
+
           const pivot = document.getElementById("doorPivot");
           if (pivot) {
             pivot.setAttribute("animation__open", {
@@ -372,34 +398,27 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Ativar componentes / handlers ---
   const terminalEl = document.getElementById("terminal");
-  if (terminalEl) terminalEl.setAttribute("terminal-system-level3-colors", "");
-  if (doorEl) doorEl.setAttribute("door-system-level3", "");
+  terminalEl?.setAttribute("terminal-system-level3-colors", "");
+  doorEl?.setAttribute("door-system-level3", "");
 
-  if (btnClose) btnClose.addEventListener("click", closeTerminal);
-  if (terminalOverlay) {
-    terminalOverlay.addEventListener("click", (e) => {
-      if (e.target === terminalOverlay) closeTerminal();
-    });
-  }
+  btnClose?.addEventListener("click", closeTerminal);
 
-  if (btnConfirm) {
-    btnConfirm.addEventListener("click", () => {
-      const ok = validateTerminal();
-      if (ok) {
-        setTimeout(() => closeTerminal(), 700);
-      }
-    });
-  }
+  terminalOverlay?.addEventListener("click", (e) => {
+    if (e.target === terminalOverlay) closeTerminal();
+  });
+
+  btnConfirm?.addEventListener("click", () => {
+    if (validateTerminal()) setTimeout(closeTerminal, 700);
+  });
 
   ["term-slot-0", "term-slot-1", "term-slot-2", "term-slot-3"].forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
+
     el.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
-        const ok = validateTerminal();
-        if (ok) setTimeout(() => closeTerminal(), 700);
+        if (validateTerminal()) setTimeout(closeTerminal, 700);
       }
     });
   });
@@ -412,8 +431,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   if (terminalStateSpan) terminalStateSpan.textContent = "TRANCADO";
-  if (terminalStatusText)
-    terminalStatusText.setAttribute("value", "TERMINAL\n[CLIQUE]");
+  terminalStatusText?.setAttribute("value", "TERMINAL\n[CLIQUE]");
   setMsg("Conta os objetos por cor e insere no terminal (esq → dir).", "white");
 
   initTerminalOrder();

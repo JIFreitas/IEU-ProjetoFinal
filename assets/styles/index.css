@@ -130,7 +130,7 @@ p {
   padding-left: 20px;
 }
 
-/* ===== Settings UI (index) ===== */
+/* ===== Settings UI ===== */
 .setting-item {
   display: flex;
   align-items: center;
@@ -270,7 +270,6 @@ input[type="range"] {
   width: calc(100% - 40px);
   text-align: center;
   box-shadow: 0 0 25px rgba(255, 0, 0, 0.35);
-
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s, transform 0.25s;

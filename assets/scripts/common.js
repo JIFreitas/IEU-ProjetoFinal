@@ -46,8 +46,8 @@ if (window.AFRAME) {
 }
 
 // ---------- Pause + Music runtime state ----------
-let __isPaused = false;
-let __musicPlaying = false;
+let isPaused = false;
+let isMusicPlaying = false;
 
 function getBgMusicEl() {
   return document.getElementById("bg-music") || null;
@@ -75,24 +75,24 @@ function applyMusicSettingsToAudio() {
 
   music.volume = vol / 100;
 
-  if (enabled && !__isPaused) {
+  if (enabled && !isPaused) {
     music
       .play()
       .then(() => {
-        __musicPlaying = true;
+        isMusicPlaying = true;
       })
       .catch(() => {
-        // browsers bloqueiam autoplay; ok
+        // Browsers podem bloquear autoplay; ok.
       });
   } else {
     music.pause();
-    __musicPlaying = false;
+    isMusicPlaying = false;
   }
 }
 
 // ---------- Global functions used by buttons ----------
 window.resumeGame = function () {
-  __isPaused = false;
+  isPaused = false;
 
   const menu = document.getElementById("pause-menu");
   if (menu) menu.style.display = "none";
@@ -137,25 +137,24 @@ window.updatePauseVolume = function (value) {
 // ---------- ESC handler ----------
 function togglePause() {
   const menu = document.getElementById("pause-menu");
-  if (!menu) return; // se a página não tiver pause-menu, ignora
+  if (!menu) return; 
 
-  __isPaused = !__isPaused;
-  menu.style.display = __isPaused ? "block" : "none";
+  isPaused = !isPaused;
+  menu.style.display = isPaused ? "block" : "none";
 
   const scene = document.querySelector("a-scene");
   if (scene) {
-    if (__isPaused) scene.pause();
+    if (isPaused) scene.pause();
     else scene.play();
   }
 
   // música segue o estado
   const music = getBgMusicEl();
   if (music) {
-    if (__isPaused && __musicPlaying) music.pause();
+    if (isPaused && isMusicPlaying) music.pause();
     else applyMusicSettingsToAudio();
   }
 
-  // (opcional) refrescar o timer visual quando fazes pausa/retomas
   if (window.__levelTimer && typeof window.__levelTimer.render === "function") {
     window.__levelTimer.render();
   }
@@ -176,17 +175,13 @@ function disableCameraWASD() {
     onTimeout: null,
     displayEl: null,
 
-    // NOVO (para o vermelho + topo)
+    // (para o vermelho + topo)
     timerTopEl: null,
     warningAt: 20,
   };
 
   function pad2(n) {
     return String(n).padStart(2, "0");
-  }
-
-  function getDisplayEl(displayId) {
-    return document.getElementById(displayId) || null;
   }
 
   function render() {
@@ -198,7 +193,10 @@ function disableCameraWASD() {
 
     // vermelho quando faltam <= warningAt (por defeito 20s)
     if (state.timerTopEl) {
-      state.timerTopEl.classList.toggle("warning", totalSeconds <= state.warningAt);
+      state.timerTopEl.classList.toggle(
+        "warning",
+        totalSeconds <= state.warningAt
+      );
     }
   }
 
@@ -214,7 +212,7 @@ function disableCameraWASD() {
     if (!state.running) return;
 
     // Se estiver pausado, congela o relógio
-    if (__isPaused) {
+    if (isPaused) {
       state.lastTick = performance.now();
       return;
     }
@@ -239,7 +237,7 @@ function disableCameraWASD() {
   // API pública
   window.startLevelTimer = function ({
     seconds,
-    displayId = "timer-text", // texto do topo
+    displayId = "timer-text", 
     onTimeout,
     warningAt = 20,
   }) {
@@ -250,8 +248,7 @@ function disableCameraWASD() {
     state.displayEl =
       document.getElementById(displayId) ||
       document.getElementById("timer-text") ||
-      getDisplayEl(displayId);
-
+      null;
     state.timerTopEl = document.getElementById("timer-top") || null;
 
     state.onTimeout = onTimeout;
@@ -302,4 +299,3 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
